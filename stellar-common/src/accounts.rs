@@ -58,13 +58,13 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
         trx.operations.iter().for_each(|operation| match &operation.body {
             stellar_xdr::curr::OperationBody::Payment(payment) => {
                 // let amount = payment.amount;
-                let amount = 10;
+                let amount = payment.amount;
                 // let asset = payment.asset.to_string();
                 let asset = String::from("");
                 let destination = payment.destination.to_string();
                 payments.payments.push(Payment {
                     source: source.clone(),
-                    amount,
+                    amount: amount as u64,
                     asset,
                     destination,
                 });
