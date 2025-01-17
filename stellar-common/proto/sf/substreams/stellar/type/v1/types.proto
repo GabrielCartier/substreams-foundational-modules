@@ -7,8 +7,9 @@ message Accounts {
 }
 
 message Account {
-  bytes address = 1;
-  uint64 balance = 2;
+  string trx_hash = 1;
+  string address = 2;
+  uint64 balance = 3;
 }
 
 message Payments {
@@ -16,9 +17,20 @@ message Payments {
 }
 
 message Payment {
-  string source = 1;
-  string destination = 2;
-  string asset = 3;
-  uint64 amount = 4;
-  string trx_id = 5;
+  string trx_hash = 1;
+  string source = 2;
+  string destination = 3;
+  string asset = 4;
+  uint64 amount = 5; // todo: check if this should be a big int instead
+}
+
+message Asset {
+  enum AssetType {
+    ASSET_TYPE_NATIVE = 0;
+    ASSET_TYPE_CREDIT_ALPHANUM4 = 1;
+    ASSET_TYPE_CREDIT_ALPHANUM12 = 2;
+  }
+  AssetType asset_type = 1;
+  // Native asset will always be XLM - the Stellar token
+  string code = 2;
 }
