@@ -29,6 +29,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
     */
 
     block.transactions.iter().for_each(|transaction| {
+        let hash = base64::encode(transaction.hash.clone());
         let trx_result = match decode_transaction_result(&transaction.result_xdr) {
             Ok(result) => result,
             Err(_) => panic!("Could not decode transaction result"),
@@ -67,6 +68,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                     amount: amount as u64,
                     asset,
                     destination,
+                    trx_id: hash.clone(),
                 });
             }
             _ => {}
@@ -75,7 +77,6 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
 
     Ok(payments)
 }
-
 fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResult, stellar_xdr::curr::Error> {
     let buf = Cursor::new(result_xdr);
     let transaction_result = TransactionResult::read_xdr(&mut Limited::new(buf, Limits::none()));

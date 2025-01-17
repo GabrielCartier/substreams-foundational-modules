@@ -20,4 +20,5 @@ message Payment {
   string destination = 2;
   string asset = 3;
   uint64 amount = 4;
+  string trx_id = 5;
 }

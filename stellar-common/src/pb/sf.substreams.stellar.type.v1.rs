@@ -31,5 +31,7 @@ pub struct Payment {
     pub asset: ::prost::alloc::string::String,
     #[prost(uint64, tag="4")]
     pub amount: u64,
+    #[prost(string, tag="5")]
+    pub trx_id: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)
