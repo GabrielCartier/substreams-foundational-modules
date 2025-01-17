@@ -1,0 +1,47 @@
+specVersion: v0.1.0
+package:
+  name: stellar_foundational
+  version: v0.1.0
+
+protobuf:
+  files:
+    - types.proto
+  importPaths:
+    - ./proto/sf/substreams/stellar/type/v1
+  descriptorSets:
+    - module: buf.build/streamingfast/firehose-stellar
+  excludePaths:
+    - google
+    - sf/substreams/
+    - sf/firehose/
+
+imports:
+  stellar: https://github.com/streamingfast/substreams-stellar/releases/download/v0.1.1/stellar-v0.1.1.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+network: stellar
+
+modules:
+  - name: map_created_accounts
+    kind: map
+    initialBlock: 600000
+    inputs:
+      - source: sf.stellar.type.v1.Block
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Accounts
+
+  - name: map_payments
+    kind: map
+    initialBlock: 600000
+    inputs:
+      - source: sf.stellar.type.v1.Block
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Payments
+
+# Foundational modules todo:
+# - people want to track account balances
+# - ability to track wallet activity (XLM or smart contract tokens)

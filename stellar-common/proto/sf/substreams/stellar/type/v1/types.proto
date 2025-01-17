@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package sf.substreams.stellar.type.v1;
+
+message Accounts {
+  repeated Account accounts = 1;
+}
+
+message Account {
+  bytes address = 1;
+  uint64 balance = 2;
+}
+
+message Payments {
+  repeated Payment payments = 1;
+}
+
+message Payment {
+  string source = 1;
+  string destination = 2;
+  string asset = 3;
+  uint64 amount = 4;
+}
