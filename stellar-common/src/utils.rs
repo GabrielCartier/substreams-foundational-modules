@@ -43,7 +43,7 @@ fn decode_transaction_envelope(envelope_xdr: &Vec<u8>) -> Result<TransactionEnve
     transaction_envelope
 }
 
-pub fn decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMeta, stellar_xdr::curr::Error> {
+pub fn _decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMeta, stellar_xdr::curr::Error> {
     let buf = Cursor::new(result_meta_xdr);
     let transaction_meta = TransactionMeta::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_meta
