@@ -1,5 +1,8 @@
 specVersion: v0.1.0
 package:
+  url: https://github.com/streamingfast/substreams-foundational-modules/stellar-common
+  description: "Foundational module for Stellar"
+  image: ./stellar.png
   name: stellar_foundational
   version: v0.1.0
 
@@ -16,7 +19,7 @@ protobuf:
     - sf/firehose/
 
 imports:
-  stellar: https://github.com/streamingfast/substreams-stellar/releases/download/v0.1.1/stellar-v0.1.1.spkg
+  stellar: https://github.com/streamingfast/substreams-stellar/releases/download/v0.1.2/stellar-v0.1.2.spkg
 
 binaries:
   default:
@@ -28,7 +31,7 @@ network: stellar
 modules:
   - name: map_created_accounts
     kind: map
-    initialBlock: 600000
+    initialBlock: 761000
     inputs:
       - source: sf.stellar.type.v1.Block
     output:
@@ -36,12 +39,34 @@ modules:
 
   - name: map_payments
     kind: map
-    initialBlock: 600000
+    initialBlock: 761000
     inputs:
       - source: sf.stellar.type.v1.Block
     output:
       type: proto:sf.substreams.stellar.type.v1.Payments
 
+  - name: index_payments
+    kind: blockIndex
+    inputs:
+      - map: map_payments
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: filtered_payments
+    kind: map
+    inputs:
+      - params: string
+      - map: map_payments
+    blockFilter:
+      module: index_payments
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Payments
+params: # Default parameters for the filtered modules. You can override these parameters based on your needs.
+  filtered_payments: "account:GCW2NGRNWISFIXSGCBXPU23GDBAMHIOQOWO52LZWEWNELRC4XDQMDWNT"
 # Foundational modules todo:
 # - people want to track account balances
 # - ability to track wallet activity (XLM or smart contract tokens)
+# create map_issue_asset with the newly created assets
+# also, check if there is a concept of a transfer or if everything is a payment

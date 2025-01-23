@@ -1,9 +1,11 @@
+use substreams::Hex;
 use crate::{
     pb::sf::{
         stellar::r#type::v1::Block,
         substreams::stellar::r#type::v1::{Account, Accounts},
     },
     utils,
+    constants
 };
 use core::panic;
 
@@ -12,7 +14,7 @@ fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
     let mut accounts = Accounts::default();
 
     block.transactions.iter().for_each(|transaction| {
-        let hash = base64::encode(transaction.hash.clone());
+        let hash = Hex(&transaction.hash).to_string();
 
         let decoded_transaction = match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
             Ok(trx) => trx,
@@ -27,7 +29,7 @@ fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
                     accounts.accounts.push(Account {
                         trx_hash: hash.clone(),
                         address: create_account.destination.to_string(),
-                        balance: (create_account.starting_balance / 10000000) as u64,
+                        balance: (create_account.starting_balance as f64) / constants::XLM_DENOMINATOR,
                     });
                 }
                 _ => {}

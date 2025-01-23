@@ -13,8 +13,8 @@ pub struct Account {
     pub trx_hash: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub address: ::prost::alloc::string::String,
-    #[prost(uint64, tag="3")]
-    pub balance: u64,
+    #[prost(double, tag="3")]
+    pub balance: f64,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -34,8 +34,8 @@ pub struct Payment {
     #[prost(string, tag="4")]
     pub asset: ::prost::alloc::string::String,
     /// todo: check if this should be a big int instead
-    #[prost(uint64, tag="5")]
-    pub amount: u64,
+    #[prost(double, tag="5")]
+    pub amount: f64,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
