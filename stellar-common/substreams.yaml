@@ -19,7 +19,7 @@ protobuf:
     - sf/firehose/
 
 imports:
-  stellar: https://github.com/streamingfast/substreams-stellar/releases/download/v0.1.2/stellar-v0.1.2.spkg
+  stellar: https://github.com/streamingfast/substreams-stellar/releases/download/v0.1.3/stellar-v0.1.3.spkg
 
 binaries:
   default:
