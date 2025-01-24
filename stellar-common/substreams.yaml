@@ -26,7 +26,7 @@ binaries:
     type: wasm/rust-v1
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
-network: stellar
+network: stellar-testnet
 
 modules:
   - name: map_created_accounts
@@ -44,6 +44,14 @@ modules:
       - source: sf.stellar.type.v1.Block
     output:
       type: proto:sf.substreams.stellar.type.v1.Payments
+
+  - name: map_issue_asset
+    kind: map
+    initialBlock: 761000
+    inputs:
+      - source: sf.stellar.type.v1.Block
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Assets
 
   - name: index_payments
     kind: blockIndex
@@ -63,10 +71,6 @@ modules:
         params: true
     output:
       type: proto:sf.substreams.stellar.type.v1.Payments
+
 params: # Default parameters for the filtered modules. You can override these parameters based on your needs.
-  filtered_payments: "account:GCW2NGRNWISFIXSGCBXPU23GDBAMHIOQOWO52LZWEWNELRC4XDQMDWNT"
-# Foundational modules todo:
-# - people want to track account balances
-# - ability to track wallet activity (XLM or smart contract tokens)
-# create map_issue_asset with the newly created assets
-# also, check if there is a concept of a transfer or if everything is a payment
+  filtered_payments: "account:GCX737AN5PYCV4ZUMGGDIGSVUW4JDFXA5NOMNLOG4GC3NRGQFJVPVGIS"

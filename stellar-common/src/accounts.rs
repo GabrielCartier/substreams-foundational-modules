@@ -1,13 +1,13 @@
-use substreams::Hex;
 use crate::{
+    constants,
     pb::sf::{
         stellar::r#type::v1::Block,
         substreams::stellar::r#type::v1::{Account, Accounts},
     },
     utils,
-    constants
 };
 use core::panic;
+use substreams::Hex;
 
 #[substreams::handlers::map]
 fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Error> {
@@ -15,6 +15,9 @@ fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
 
     block.transactions.iter().for_each(|transaction| {
         let hash = Hex(&transaction.hash).to_string();
+        if utils::transaction_failed(transaction.status) {
+            return;
+        }
 
         let decoded_transaction = match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
             Ok(trx) => trx,

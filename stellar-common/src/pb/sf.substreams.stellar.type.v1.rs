@@ -39,43 +39,18 @@ pub struct Payment {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Assets {
+    #[prost(message, repeated, tag="1")]
+    pub assets: ::prost::alloc::vec::Vec<Asset>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Asset {
-    #[prost(enumeration="asset::AssetType", tag="1")]
-    pub asset_type: i32,
-    /// Native asset will always be XLM - the Stellar token
+    #[prost(string, tag="1")]
+    pub trx_hash: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub code: ::prost::alloc::string::String,
-}
-/// Nested message and enum types in `Asset`.
-pub mod asset {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum AssetType {
-        Native = 0,
-        CreditAlphanum4 = 1,
-        CreditAlphanum12 = 2,
-    }
-    impl AssetType {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                AssetType::Native => "ASSET_TYPE_NATIVE",
-                AssetType::CreditAlphanum4 => "ASSET_TYPE_CREDIT_ALPHANUM4",
-                AssetType::CreditAlphanum12 => "ASSET_TYPE_CREDIT_ALPHANUM12",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "ASSET_TYPE_NATIVE" => Some(Self::Native),
-                "ASSET_TYPE_CREDIT_ALPHANUM4" => Some(Self::CreditAlphanum4),
-                "ASSET_TYPE_CREDIT_ALPHANUM12" => Some(Self::CreditAlphanum12),
-                _ => None,
-            }
-        }
-    }
+    #[prost(string, tag="3")]
+    pub issuer: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)
