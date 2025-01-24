@@ -59,7 +59,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
 }
 
 #[substreams::handlers::map]
-fn filtered_accounts(query: String, payments: Payments) -> Result<Payments, substreams::errors::Error> {
+fn filtered_payments(query: String, payments: Payments) -> Result<Payments, substreams::errors::Error> {
     let query = substreams::expr_matcher(&query);
 
     let mut filtered_payments = Payments {

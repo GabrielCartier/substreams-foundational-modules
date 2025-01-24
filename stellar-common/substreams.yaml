@@ -62,13 +62,13 @@ modules:
 
   - name: filtered_payments
     kind: map
-    inputs:
-      - params: string
-      - map: map_payments
     blockFilter:
       module: index_payments
       query:
         params: true
+    inputs:
+      - params: string
+      - map: map_payments
     output:
       type: proto:sf.substreams.stellar.type.v1.Payments
 
