@@ -32,7 +32,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                 let asset = utils::match_asset_code(&payment.asset);
                 let destination = payment.destination.to_string();
                 let source;
-                if asset == "XLM" {
+                if asset == constants::XML_ASSET_CODE {
                     source = constants::XLM_SOURCE_ACCOUNT.into();
                 } else {
                     source = match operation.source_account.as_ref() {
