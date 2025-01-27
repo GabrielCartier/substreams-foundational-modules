@@ -32,6 +32,13 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
+  - name: my_block
+    kind: map
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output: 
+      type: proto:sf.ethereum.type.v2.Block
+
   - name: all_events
     kind: map
     inputs:
@@ -158,7 +165,7 @@ modules:
       Example: evt_sig:0x9bb8f83800000000000000000000000000000000000000000000000000000000 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)
 
 params:
-  filtered_events: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31"
+  filtered_events: "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f"
   filtered_calls: "call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7"
   filtered_transactions: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)"
   filtered_events_and_calls: "evt_sig:0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31 || (call_method:0xa9059cbb && call_to:0xdac17f958d2ee523a2206206994597c13d831ec7)"

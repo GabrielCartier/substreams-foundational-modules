@@ -1,14 +1,21 @@
 use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
 use substreams::matches_keys_in_parsed_expr;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
 
 #[substreams::handlers::map]
 fn all_calls(blk: Block) -> Result<Calls, Error> {
+    _all_calls(blk)
+}
+
+/*
+    all_calls is equal to _all_calls. This is just for unit testing purposes.
+*/
+pub fn _all_calls(blk: Block) -> Result<Calls, Error> {
     let clock = Clock {
         timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
         id: Hex::encode(&blk.hash),
@@ -50,26 +57,23 @@ fn index_calls(calls: Calls) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
-    let filtered: Vec<Call> = calls
-        .calls
-        .into_iter()
-        .filter(|e| {
-            if let Some(call) = &e.call {
-                call_matches(call, &query).expect("matching calls from query")
-            } else {
-                false
-            }
-        })
-        .collect();
-
-    Ok(Calls {
-        calls: filtered,
-        clock: calls.clock,
-    })
+    _filtered_calls(query, calls)
 }
 
-pub fn call_matches(call: &substreams_ethereum::pb::eth::v2::Call, query: &str) -> Result<bool, Error> {
-    matches_keys_in_parsed_expr(&call_keys(call), query)
+/*
+    filtered_calls is equal to _filtered_calls. This is just for unit testing purposes.
+*/
+pub fn _filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
+    let matcher = substreams::expr_matcher(&query);
+
+    calls.calls.retain(|call| {
+        let keys = call_keys(call.call.as_ref().unwrap());
+        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+        matcher.matches_keys(&keys)
+    });
+
+    Ok(calls)
 }
 
 pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
@@ -91,4 +95,71 @@ pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
     }
 
     keys
+}
+
+pub mod tests {
+    use super::*;
+
+    use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
+    use prost::Message;
+
+    use anyhow::Error;
+    use substreams_ethereum::pb::eth::v2::Block;
+
+    use base64::decode;
+    use std::fs;
+
+    #[test]
+    fn test_all_calls() {
+        let block = parse_block().expect("Failed to parse block");
+
+        let result = _all_calls(block).expect("Failed to execute function");
+        assert_eq!(result.calls.len(), 670);
+    }
+
+    #[test]
+    fn test_filtered_calls() {
+        // Given
+        let block = parse_block().expect("Failed to parse block");
+
+        let calls_obj = Calls {
+            calls: block
+                .calls()
+                .into_iter()
+                .map(|c| {
+                    return Call {
+                        tx_hash: "0x".to_owned(),
+                        call: Some(c.call.clone()),
+                    };
+                })
+                .collect(),
+            clock: None,
+        };
+
+        // When
+        let result = _filtered_calls(
+            "call_from:0x5acc84a3e955bdd76467d3348077d003f00ffb97".to_owned(),
+            calls_obj,
+        )
+        .expect("Failed to execute function");
+
+        // Expect
+        result.calls.iter().for_each(|c| {
+            let caller = &c.call.as_ref().unwrap().caller;
+
+            assert_eq!(
+                Hex::encode(&caller),
+                "5acc84a3e955bdd76467d3348077d003f00ffb97"
+            );
+        });
+    }
+
+    fn parse_block() -> Result<Block, Error> {
+        let encoded = fs::read_to_string("./src/test_block_10500500")?;
+
+        // Decode Base64 into raw bytes
+        let raw_bytes = decode(&encoded)?;
+
+        return Ok(Block::decode(&*raw_bytes).expect("Not able to decode Block"));
+    }
 }
