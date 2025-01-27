@@ -1,7 +1,8 @@
+use core::panic;
 use std::io::Cursor;
 use stellar_xdr::curr::{
-    Limited, Limits, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionResult,
-    TransactionResultResult,
+    AccountMergeResult, Limited, Limits, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionMetaV3,
+    TransactionResult, TransactionResultResult,
 };
 
 use crate::constants;
@@ -10,7 +11,7 @@ pub fn decode_transaction(
     result_xdr: &Vec<u8>,
     envelope_xdr: &Vec<u8>,
 ) -> Result<Transaction, substreams::errors::Error> {
-    let trx_result = match decode_transaction_result(result_xdr) {
+    let trx_result: TransactionResult = match decode_transaction_result(result_xdr) {
         Ok(result) => result,
         Err(_) => panic!("Could not decode transaction result"),
     };
@@ -33,10 +34,29 @@ pub fn decode_transaction(
     return Ok(trx_v1.tx);
 }
 
-fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResult, stellar_xdr::curr::Error> {
+pub fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResult, stellar_xdr::curr::Error> {
     let buf = Cursor::new(result_xdr);
     let transaction_result = TransactionResult::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_result
+}
+
+pub fn decode_account_merge_result(transaction_result: &TransactionResult) -> Option<i64> {
+    match &transaction_result.result {
+        stellar_xdr::curr::TransactionResultResult::TxSuccess(operation_results) => {
+            for operation_result in operation_results.as_vec() {
+                if let stellar_xdr::curr::OperationResult::OpInner(
+                    stellar_xdr::curr::OperationResultTr::AccountMerge(account_merge_result),
+                ) = operation_result
+                {
+                    if let AccountMergeResult::Success(value) = account_merge_result {
+                        return Some(*value);
+                    }
+                }
+            }
+            None
+        }
+        _ => None,
+    }
 }
 
 fn decode_transaction_envelope(envelope_xdr: &Vec<u8>) -> Result<TransactionEnvelope, stellar_xdr::curr::Error> {
@@ -45,10 +65,13 @@ fn decode_transaction_envelope(envelope_xdr: &Vec<u8>) -> Result<TransactionEnve
     transaction_envelope
 }
 
-pub fn _decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMeta, stellar_xdr::curr::Error> {
+pub fn decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMetaV3, stellar_xdr::curr::Error> {
     let buf = Cursor::new(result_meta_xdr);
     let transaction_meta = TransactionMeta::read_xdr(&mut Limited::new(buf, Limits::none()));
-    transaction_meta
+    match transaction_meta {
+        Ok(TransactionMeta::V3(meta_v3)) => Ok(meta_v3),
+        _ => panic!("Could not decode transaction meta"),
+    }
 }
 
 pub fn transaction_failed(status: i32) -> bool {

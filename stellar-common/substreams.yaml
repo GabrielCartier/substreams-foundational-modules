@@ -37,6 +37,14 @@ modules:
     output:
       type: proto:sf.substreams.stellar.type.v1.Accounts
 
+  - name: map_deleted_accounts
+    kind: map
+    initialBlock: 761000
+    inputs:
+      - source: sf.stellar.type.v1.Block
+    output:
+      type: proto:sf.substreams.stellar.type.v1.Accounts
+
   - name: map_payments
     kind: map
     initialBlock: 761000

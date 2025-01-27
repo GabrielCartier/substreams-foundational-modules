@@ -42,7 +42,6 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                         None => utils::fetch_asset_issuer(&payment.asset),
                     }
                 }
-                // substreams::log::println(format!("payment.amount {}", payment.amount));
                 payments.payments.push(Payment {
                     source: source,
                     amount: amount,
@@ -50,6 +49,26 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                     destination,
                     trx_hash: hash.clone(),
                 });
+            }
+            stellar_xdr::curr::OperationBody::AccountMerge(muxed_account) => {
+                let destination_account = muxed_account.to_string();
+                let result_xdr = match utils::decode_transaction_result(&transaction.result_xdr) {
+                    Ok(result) => result,
+                    Err(_) => return,
+                };
+                match utils::decode_account_merge_result(&result_xdr) {
+                    Some(result) => {
+                        let amount = result as f64 / constants::XLM_DENOMINATOR;
+                        payments.payments.push(Payment {
+                            source: trx.source_account.to_string(), // considering that the account is closed, maybe we should set the source as empty?
+                            amount,
+                            asset: constants::XML_ASSET_CODE.to_string(),
+                            destination: destination_account,
+                            trx_hash: hash.clone(),
+                        });
+                    }
+                    None => return,
+                }
             }
             _ => {}
         });
@@ -82,4 +101,8 @@ fn filtered_payments(query: String, payments: Payments) -> Result<Payments, subs
         -> https://stellar.expert/explorer/testnet/tx/0a0ecdb780d8eb06c45f433a3b45c6628e06dd6fd71a7c985363b4b9c7a4a413
         - Transfers the XLM balance of an account to another account and removes the source account from the ledger
         - https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#account-merge
+    Also, when a merge account operation is successful it will close the account and remove it from the ledger.
+
+    This means we would need to listen on a that specific event also, so the client side, knows when to stop
+    listening for that account and consider it closed.
 */

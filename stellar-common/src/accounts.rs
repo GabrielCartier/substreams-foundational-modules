@@ -41,3 +41,40 @@ fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
 
     Ok(accounts)
 }
+
+#[substreams::handlers::map]
+fn map_deleted_accounts(block: Block) -> Result<Accounts, substreams::errors::Error> {
+    let mut accounts = Accounts::default();
+
+    block.transactions.iter().for_each(|transaction| {
+        let hash = Hex(&transaction.hash).to_string();
+        if utils::transaction_failed(transaction.status) {
+            return;
+        }
+
+        let decoded_transaction_meta = match utils::decode_transaction_meta(&transaction.result_meta_xdr) {
+            Ok(trx) => trx,
+            Err(_) => return,
+        };
+
+        for operation_meta in decoded_transaction_meta.operations.as_vec() {
+            for change in operation_meta.changes.0.as_vec() {
+                match change {
+                    stellar_xdr::curr::LedgerEntryChange::Removed(ledger_key) => match ledger_key {
+                        stellar_xdr::curr::LedgerKey::Account(ledger_key_account) => {
+                            accounts.accounts.push(Account {
+                                trx_hash: hash.clone(),
+                                address: ledger_key_account.account_id.to_string(),
+                                balance: 0.0,
+                            });
+                        }
+                        _ => {}
+                    },
+                    _ => {}
+                }
+            }
+        }
+    });
+
+    Ok(accounts)
+}
