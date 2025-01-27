@@ -75,3 +75,11 @@ fn filtered_payments(query: String, payments: Payments) -> Result<Payments, subs
 
     Ok(filtered_payments)
 }
+
+/*
+    TODO: MergeAccount operation
+        - do we want to output also the merge account operation?
+        -> https://stellar.expert/explorer/testnet/tx/0a0ecdb780d8eb06c45f433a3b45c6628e06dd6fd71a7c985363b4b9c7a4a413
+        - Transfers the XLM balance of an account to another account and removes the source account from the ledger
+        - https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#account-merge
+*/
