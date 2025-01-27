@@ -28,7 +28,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
 
         trx.operations.iter().for_each(|operation| match &operation.body {
             stellar_xdr::curr::OperationBody::Payment(payment) => {
-                let amount = payment.amount as f64 / constants::XLM_DENOMINATOR; // todo: valid with them
+                let amount = payment.amount as f64 / constants::XLM_DENOMINATOR;
                 let asset = utils::match_asset_code(&payment.asset);
                 let destination = payment.destination.to_string();
                 let source;
@@ -42,7 +42,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                         None => utils::fetch_asset_issuer(&payment.asset),
                     }
                 }
-                substreams::log::println(format!("payment.amount {}", payment.amount));
+                // substreams::log::println(format!("payment.amount {}", payment.amount));
                 payments.payments.push(Payment {
                     source: source,
                     amount: amount,
