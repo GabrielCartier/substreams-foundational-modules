@@ -35,13 +35,19 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                 if asset == constants::XML_ASSET_CODE {
                     source = constants::XLM_SOURCE_ACCOUNT.into();
                 } else {
+                    // this is true in the case of a mint, it's not true in the case of a token transfer
                     source = match operation.source_account.as_ref() {
                         Some(account) => account.to_string(),
-                        // If there is no source account, we need to fetch the issuer of the asset
-                        // it means we have a mint that occurred on chain.
-                        None => utils::fetch_asset_issuer(&payment.asset),
+
+                        None => {
+                            // FIXME: If there is no source account, we need to fetch the issuer of the asset
+                            // it means we have a mint that occurred on chain.
+                            // utils::fetch_asset_issuer(&payment.asset)
+                            trx.source_account.to_string()
+                        }
                     }
                 }
+                substreams::log::println(format!("source account {}", source));
                 payments.payments.push(Payment {
                     source: source,
                     amount: amount,
@@ -60,7 +66,7 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                     Some(result) => {
                         let amount = result as f64 / constants::XLM_DENOMINATOR;
                         payments.payments.push(Payment {
-                            source: trx.source_account.to_string(), // considering that the account is closed, maybe we should set the source as empty?
+                            source: trx.source_account.to_string(),
                             amount,
                             asset: constants::XML_ASSET_CODE.to_string(),
                             destination: destination_account,
