@@ -31,27 +31,34 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                 let amount = payment.amount as f64 / constants::XLM_DENOMINATOR;
                 let asset = utils::match_asset_code(&payment.asset);
                 let destination = payment.destination.to_string();
-                let mut source;
+                let source;
                 if asset == constants::XML_ASSET_CODE {
-                    source = constants::XLM_SOURCE_ACCOUNT.into();
-                    let trx_source = trx.source_account.to_string();
-                    if trx_source != "" {
-                        source = trx_source;
-                    }
-                } else {
-                    // this is true in the case of a mint, it's not true in the case of a token transfer
                     source = match operation.source_account.as_ref() {
                         Some(account) => account.to_string(),
 
                         None => {
-                            // FIXME: If there is no source account, we need to fetch the issuer of the asset
-                            // it means we have a mint that occurred on chain.
-                            // utils::fetch_asset_issuer(&payment.asset)
-                            trx.source_account.to_string()
+                            let trx_source = trx.source_account.to_string();
+                            if trx_source != "" {
+                                trx_source
+                            } else {
+                                constants::XLM_SOURCE_ACCOUNT.into()
+                            }
+                        }
+                    }
+                } else {
+                    source = match operation.source_account.as_ref() {
+                        Some(account) => account.to_string(),
+
+                        None => {
+                            let trx_source = trx.source_account.to_string();
+                            if trx_source != "" {
+                                trx_source
+                            } else {
+                                utils::fetch_asset_issuer(&payment.asset)
+                            }
                         }
                     }
                 }
-                substreams::log::println(format!("source account {}", source));
                 payments.payments.push(Payment {
                     source: source,
                     amount: amount,
