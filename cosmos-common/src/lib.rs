@@ -1,4 +1,5 @@
 mod pb;
+mod testing;
 
 use core::panic;
 use std::collections::HashMap;
@@ -36,8 +37,8 @@ use pb::sf::substreams::v1::Clock;
 use prost_types::Any;
 use sha2::{Digest, Sha256};
 use substreams::errors::Error;
+use substreams::key;
 use substreams::log;
-use substreams::matches_keys_in_parsed_expr;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
 // #[substreams::handlers::map]
@@ -169,7 +170,7 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
 }
 
 fn _filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
-    let matcher = substreams::expr_matcher(&query);
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
 
     let filtered: Vec<Event> = events
         .events
@@ -200,6 +201,12 @@ fn _filtered_events(query: String, events: EventList) -> Result<EventList, Error
 
 #[substreams::handlers::map]
 fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
+    _filtered_event_groups(query, events)
+}
+
+fn _filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+
     let matching_trx_hashes = events
         .events
         .iter()
@@ -210,7 +217,8 @@ fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, 
                 ev.attributes.iter().for_each(|attr| {
                     keys.push(format!("attr:{}", attr.key));
                 });
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+
+                matcher.matches_keys(&keys)
             } else {
                 false
             }
@@ -278,6 +286,12 @@ fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, 
 
 #[substreams::handlers::map]
 fn filtered_events_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
+    _filtered_events_by_attribute_value(query, events)
+}
+
+fn _filtered_events_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+
     let filtered: Vec<Event> = events
         .events
         .into_iter()
@@ -289,7 +303,8 @@ fn filtered_events_by_attribute_value(query: String, events: EventList) -> Resul
                     keys.push(format!("attr:{}", attr.key));
                     keys.push(format!("attr:{}:{}", attr.key, attr.value));
                 });
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+
+                matcher.matches_keys(&keys)
             } else {
                 false
             }
@@ -307,6 +322,12 @@ fn filtered_events_by_attribute_value(query: String, events: EventList) -> Resul
 
 #[substreams::handlers::map]
 fn filtered_event_groups_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
+    _filtered_event_groups_by_attribute_value(query, events)
+}
+
+fn _filtered_event_groups_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+
     let matching_trx_hashes = events
         .events
         .iter()
@@ -318,13 +339,16 @@ fn filtered_event_groups_by_attribute_value(query: String, events: EventList) ->
                     keys.push(format!("attr:{}", attr.key));
                     keys.push(format!("attr:{}:{}", attr.key, attr.value));
                 });
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+
+                matcher.matches_keys(&keys)
             } else {
                 false
             }
         })
         .map(|e| (e.transaction_hash.to_string(), true))
         .collect::<HashMap<String, bool>>();
+
+    println!("{}", matching_trx_hashes.len().to_string());
 
     let filtered: Vec<Event> = events
         .events
@@ -347,6 +371,8 @@ fn filtered_trx_by_events_attribute_value(
     events: EventList,
     trxs: TransactionList,
 ) -> Result<TransactionList, Error> {
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+
     let matching_trx_hashes = events
         .events
         .iter()
@@ -358,7 +384,8 @@ fn filtered_trx_by_events_attribute_value(
                     keys.push(format!("attr:{}", attr.key));
                     keys.push(format!("attr:{}:{}", attr.key, attr.value));
                 });
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+
+                matcher.matches_keys(&keys)
             } else {
                 false
             }
@@ -539,4 +566,164 @@ fn compute_tx_hash(tx_as_bytes: &[u8]) -> String {
     hasher.update(tx_as_bytes);
     let tx_hash = hasher.finalize();
     return hex::encode(tx_hash);
+}
+
+#[cfg(test)]
+mod tests {
+    use substreams::log::println;
+
+    use super::*;
+
+    #[test]
+    fn test_filtered_events() {
+        // Given
+        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+
+        // When
+        let result = _filtered_events(
+            "type:transfer".to_owned(),
+            EventList {
+                clock: None,
+                events: block
+                    .events
+                    .iter()
+                    .map(|evt| Event {
+                        transaction_hash: "0x".to_owned(),
+                        event: Some(evt.clone()),
+                    })
+                    .collect(),
+            },
+        );
+
+        // Expect
+        let result_events = result.unwrap().events;
+
+        assert!(result_events.len() > 0);
+        result_events
+            .iter()
+            .for_each(|event| assert_eq!(event.event.as_ref().unwrap().r#type, "transfer"));
+    }
+
+    #[test]
+    fn test_filtered_event_groups() {
+        // Given
+        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+
+        // When
+        let result = _filtered_event_groups(
+            "type:transfer".to_owned(),
+            EventList {
+                clock: None,
+                events: block
+                    .events
+                    .iter()
+                    .map(|evt| Event {
+                        transaction_hash: "0x".to_owned(),
+                        event: Some(evt.clone()),
+                    })
+                    .collect(),
+            },
+        );
+
+        // Expect
+        let result_events = result.unwrap().events;
+
+        assert!(result_events.len() > 0);
+        result_events.iter().for_each(|event| {
+            let inner_event = event.event.as_ref().unwrap();
+
+            if inner_event.r#type == "transfer" {
+                assert_eq!(inner_event.attributes.iter().any(|attr| attr.key == "sender"), true)
+            }
+        });
+    }
+
+    #[test]
+    fn test_filtered_event_by_attribute_value() {
+        // Given
+        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+
+        // When
+        let result = _filtered_events_by_attribute_value(
+            "type:transfer && attr:sender:inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk".to_owned(),
+            EventList {
+                clock: None,
+                events: block
+                    .events
+                    .iter()
+                    .map(|evt| Event {
+                        transaction_hash: "0x".to_owned(),
+                        event: Some(evt.clone()),
+                    })
+                    .collect(),
+            },
+        );
+
+        // Expect
+        let result_events = result.unwrap().events;
+
+        assert!(result_events.len() > 0);
+        result_events.iter().for_each(|event| {
+            let inner_event = event.event.as_ref().unwrap();
+
+            assert_eq!(inner_event.r#type, "transfer");
+            assert_eq!(
+                inner_event
+                    .attributes
+                    .iter()
+                    .any(|attr| attr.key == "sender" && attr.value == "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"),
+                true
+            )
+        });
+    }
+
+    /*
+    // NOT WORKING
+    #[test]
+    fn test_filtered_event_groups_by_attribute_value() {
+        // Given
+        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+        block.events.iter().for_each(|evt| println!("{}", evt.r#type));
+
+        //println!("{}", events.len().to_string());
+        println!("-----------------------------------!");
+        // When
+        let result = _filtered_event_groups_by_attribute_value(
+            // "type:transfer && attr:sender:inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
+            "type:transfer".to_owned(),
+            EventList {
+                clock: None,
+                events: block
+                    .events
+                    .iter()
+                    .map(|evt| Event {
+                        transaction_hash: "0x".to_owned(),
+                        event: Some(evt.clone()),
+                    })
+                    .collect(),
+            },
+        );
+
+        // Expect
+        let result_events = result.unwrap().events;
+
+        assert!(result_events.len() > 0);
+        result_events.iter().for_each(|event| {
+            let inner_event = event.event.as_ref().unwrap();
+            println!("{}", inner_event.r#type);
+
+            inner_event
+                .attributes
+                .iter()
+                .for_each(|attr| println!("{} {}", attr.key, attr.value));
+
+            assert_eq!(
+                inner_event
+                    .attributes
+                    .iter()
+                    .any(|attr| attr.key == "sender" && attr.value == "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"),
+                true
+            )
+        });
+    }*/
 }
