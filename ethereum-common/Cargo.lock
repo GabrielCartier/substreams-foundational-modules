@@ -333,7 +333,6 @@ dependencies = [
  "hex-literal",
  "num-bigint",
  "prost 0.13.4",
- "prost-reflect",
  "prost-types 0.13.4",
  "regex",
  "serde",
@@ -893,17 +892,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.60",
-]
-
-[[package]]
-name = "prost-reflect"
-version = "0.14.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc9647f03b808b79abca8408b1609be9887ba90453c940d00332a60eeb6f5748"
-dependencies = [
- "once_cell",
- "prost 0.13.4",
- "prost-types 0.13.4",
 ]
 
 [[package]]

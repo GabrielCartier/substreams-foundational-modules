@@ -40,12 +40,10 @@ fn filtered_events_and_calls(
     events: Events,
     calls: Calls,
 ) -> Result<EventsAndCalls, Error> {
-    return _filtered_events_and_calls(query, events, calls);
+    _filtered_events_and_calls(query, events, calls)
 }
 
-/*
-    filtered_events_and_calls is equal to _filtered_events_and_calls. This is just for unit testing purposes.
-*/
+// _filtered_events_and_calls is equal to [filtered_events_and_calls] but exists only for unit testing purposes.
 fn _filtered_events_and_calls(
     query: String,
     mut events: Events,
@@ -76,12 +74,10 @@ fn _filtered_events_and_calls(
 
 #[substreams::handlers::map]
 fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
-    return _filtered_transactions(query, block);
+    _filtered_transactions(query, block)
 }
 
-/*
-    filtered_transactions is equal to _filtered_transactions. This is just for unit testing purposes.
-*/
+// _filtered_transactions is equal to [filtered_transactions] but exists only for unit testing purposes.
 fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
     let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
     block.logs().for_each(|log| {
@@ -151,21 +147,15 @@ fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, E
     })
 }
 
+#[cfg(test)]
 pub mod tests {
     use super::*;
-
-    use prost::Message;
-
-    use anyhow::Error;
-    use substreams_ethereum::pb::eth::v2::Block;
-
-    use base64::decode;
-    use std::fs;
+    use crate::testing;
 
     #[test]
     fn test_filtered_events_and_calls() {
         // Given
-        let block = parse_block().expect("Failed to parse block");
+        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
         let events = Events {
             events: block
@@ -224,7 +214,7 @@ pub mod tests {
     #[test]
     fn test_filtered_transactions() {
         // Given
-        let block = parse_block().expect("Failed to parse block");
+        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
         let result = _filtered_transactions(
@@ -253,14 +243,5 @@ pub mod tests {
                     assert_eq!(Hex::encode(&input_bytes[..4]), "029b2f34");
                 });
             });
-    }
-
-    fn parse_block() -> Result<Block, Error> {
-        let encoded = fs::read_to_string("./src/test_block_10500500")?;
-
-        // Decode Base64 into raw bytes
-        let raw_bytes = decode(&encoded)?;
-
-        return Ok(Block::decode(&*raw_bytes).expect("Not able to decode Block"));
     }
 }

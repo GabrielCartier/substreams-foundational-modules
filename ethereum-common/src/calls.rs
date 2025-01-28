@@ -2,7 +2,6 @@ use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use substreams::errors::Error;
-use substreams::matches_keys_in_parsed_expr;
 use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::Block;
@@ -12,10 +11,9 @@ fn all_calls(blk: Block) -> Result<Calls, Error> {
     _all_calls(blk)
 }
 
-/*
-    all_calls is equal to _all_calls. This is just for unit testing purposes.
-*/
-pub fn _all_calls(blk: Block) -> Result<Calls, Error> {
+
+// _all_calls is equal to [all_calls] but exists only for unit testing purposes.
+fn _all_calls(blk: Block) -> Result<Calls, Error> {
     let clock = Clock {
         timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
         id: Hex::encode(&blk.hash),
@@ -60,10 +58,8 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
     _filtered_calls(query, calls)
 }
 
-/*
-    filtered_calls is equal to _filtered_calls. This is just for unit testing purposes.
-*/
-pub fn _filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
+// _filtered_calls is equal to [filtered_calls] but exists only for unit testing purposes.
+fn _filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
     let matcher = substreams::expr_matcher(&query);
 
     calls.calls.retain(|call| {
@@ -97,21 +93,18 @@ pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
     keys
 }
 
+#[cfg(test)]
 pub mod tests {
     use super::*;
 
-    use crate::pb::sf::substreams::ethereum::v1::{Call, Calls};
-    use prost::Message;
-
-    use anyhow::Error;
-    use substreams_ethereum::pb::eth::v2::Block;
-
-    use base64::decode;
-    use std::fs;
+    use crate::{
+        pb::sf::substreams::ethereum::v1::{Call, Calls},
+        testing,
+    };
 
     #[test]
     fn test_all_calls() {
-        let block = parse_block().expect("Failed to parse block");
+        let block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
         let result = _all_calls(block).expect("Failed to execute function");
         assert_eq!(result.calls.len(), 670);
@@ -120,7 +113,7 @@ pub mod tests {
     #[test]
     fn test_filtered_calls() {
         // Given
-        let block = parse_block().expect("Failed to parse block");
+        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
         let calls_obj = Calls {
             calls: block
@@ -152,14 +145,5 @@ pub mod tests {
                 "5acc84a3e955bdd76467d3348077d003f00ffb97"
             );
         });
-    }
-
-    fn parse_block() -> Result<Block, Error> {
-        let encoded = fs::read_to_string("./src/test_block_10500500")?;
-
-        // Decode Base64 into raw bytes
-        let raw_bytes = decode(&encoded)?;
-
-        return Ok(Block::decode(&*raw_bytes).expect("Not able to decode Block"));
     }
 }
