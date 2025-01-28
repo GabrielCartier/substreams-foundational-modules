@@ -31,9 +31,13 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
                 let amount = payment.amount as f64 / constants::XLM_DENOMINATOR;
                 let asset = utils::match_asset_code(&payment.asset);
                 let destination = payment.destination.to_string();
-                let source;
+                let mut source;
                 if asset == constants::XML_ASSET_CODE {
                     source = constants::XLM_SOURCE_ACCOUNT.into();
+                    let trx_source = trx.source_account.to_string();
+                    if trx_source != "" {
+                        source = trx_source;
+                    }
                 } else {
                     // this is true in the case of a mint, it's not true in the case of a token transfer
                     source = match operation.source_account.as_ref() {
