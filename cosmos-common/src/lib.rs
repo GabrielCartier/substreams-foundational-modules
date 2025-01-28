@@ -112,7 +112,7 @@ pub fn all_events(block: Block) -> Result<EventList, Error> {
         return Err(anyhow!("Transaction list and result list do not match"));
     }
 
-    // block events are the combination of BeginBlockEvents and EndBlockEvents 
+    // block events are the combination of BeginBlockEvents and EndBlockEvents
     events.extend(block.events.into_iter().map(|event| {
         return Event {
             event: Some(event),
@@ -165,6 +165,12 @@ fn index_events(events: EventList) -> Result<Keys, Error> {
 
 #[substreams::handlers::map]
 fn filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
+    _filtered_events(query, events)
+}
+
+fn _filtered_events(query: String, events: EventList) -> Result<EventList, Error> {
+    let matcher = substreams::expr_matcher(&query);
+
     let filtered: Vec<Event> = events
         .events
         .into_iter()
@@ -175,7 +181,8 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
                 ev.attributes.iter().for_each(|attr| {
                     keys.push(format!("attr:{}", attr.key));
                 });
-                matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
+
+                matcher.matches_keys(&keys)
             } else {
                 false
             }
@@ -193,7 +200,7 @@ fn filtered_events(query: String, events: EventList) -> Result<EventList, Error>
 
 #[substreams::handlers::map]
 fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, Error> {
-    let matching_trx_hashes= events
+    let matching_trx_hashes = events
         .events
         .iter()
         .filter(|e| {
@@ -214,9 +221,7 @@ fn filtered_event_groups(query: String, events: EventList) -> Result<EventList, 
     let filtered: Vec<Event> = events
         .events
         .into_iter()
-        .filter(|e| {
-            matching_trx_hashes.contains_key(e.transaction_hash.as_str())
-        })
+        .filter(|e| matching_trx_hashes.contains_key(e.transaction_hash.as_str()))
         .collect();
 
     if filtered.len() == 0 {
@@ -302,7 +307,7 @@ fn filtered_events_by_attribute_value(query: String, events: EventList) -> Resul
 
 #[substreams::handlers::map]
 fn filtered_event_groups_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
-    let matching_trx_hashes= events
+    let matching_trx_hashes = events
         .events
         .iter()
         .filter(|e| {
@@ -324,9 +329,7 @@ fn filtered_event_groups_by_attribute_value(query: String, events: EventList) ->
     let filtered: Vec<Event> = events
         .events
         .into_iter()
-        .filter(|e| {
-            matching_trx_hashes.contains_key(e.transaction_hash.as_str())
-        })
+        .filter(|e| matching_trx_hashes.contains_key(e.transaction_hash.as_str()))
         .collect();
 
     if filtered.len() == 0 {
@@ -339,8 +342,12 @@ fn filtered_event_groups_by_attribute_value(query: String, events: EventList) ->
 }
 
 #[substreams::handlers::map]
-fn filtered_trx_by_events_attribute_value(query: String, events: EventList, trxs: TransactionList) -> Result<TransactionList, Error> {
-    let matching_trx_hashes= events
+fn filtered_trx_by_events_attribute_value(
+    query: String,
+    events: EventList,
+    trxs: TransactionList,
+) -> Result<TransactionList, Error> {
+    let matching_trx_hashes = events
         .events
         .iter()
         .filter(|e| {
