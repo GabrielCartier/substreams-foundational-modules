@@ -62,19 +62,13 @@ fn _transactions_by_programid_and_account_without_votes(
 }
 
 mod tests {
-    use std::fs;
-
-    use anyhow::Error;
-    use base64::decode;
-    use prost::Message;
-    use substreams_solana::pb::sf::solana::r#type::v1::Block;
-
-    use super::{_transactions_by_programid_and_account_without_votes, _transactions_by_programid_without_votes};
+    use super::*;
+    use crate::testing;
 
     #[test]
     fn test_transactions_by_programid_without_votes() {
         // Given
-        let block = parse_block().expect("Failed to parse block");
+        let block = testing::read_block("testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
         let result = _transactions_by_programid_without_votes(
@@ -98,7 +92,7 @@ mod tests {
     #[test]
     fn test_transactions_by_programid_and_account_without_votes() {
         // Given
-        let block = parse_block().expect("Failed to parse block");
+        let block = testing::read_block("testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
         let result = _transactions_by_programid_and_account_without_votes(
@@ -133,14 +127,5 @@ mod tests {
 
             assert_eq!(matched, true)
         });
-    }
-
-    fn parse_block() -> Result<Block, Error> {
-        let encoded = fs::read_to_string("./src/test_block_313000000")?;
-
-        // Decode Base64 into raw bytes
-        let raw_bytes = decode(&encoded)?;
-
-        return Ok(Block::decode(&*raw_bytes).expect("Not able to decode Block"));
     }
 }
