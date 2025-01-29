@@ -54,7 +54,7 @@ fn filtered_events(query: String, events: Events) -> Result<Events, Error> {
     _filtered_events(query, events)
 }
 
-// _filtered_events is equal to [filtered_events] but exists only for unit testing purposes.
+/// _filtered_events is equal to [filtered_events] but exists only for unit testing purposes.
 fn _filtered_events(query: String, mut events: Events) -> Result<Events, Error> {
     let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
 

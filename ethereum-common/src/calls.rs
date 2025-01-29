@@ -12,7 +12,7 @@ fn all_calls(blk: Block) -> Result<Calls, Error> {
 }
 
 
-// _all_calls is equal to [all_calls] but exists only for unit testing purposes.
+/// _all_calls is equal to [all_calls] but exists only for unit testing purposes.
 fn _all_calls(blk: Block) -> Result<Calls, Error> {
     let clock = Clock {
         timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
@@ -58,7 +58,7 @@ fn filtered_calls(query: String, calls: Calls) -> Result<Calls, Error> {
     _filtered_calls(query, calls)
 }
 
-// _filtered_calls is equal to [filtered_calls] but exists only for unit testing purposes.
+/// _filtered_calls is equal to [filtered_calls] but exists only for unit testing purposes.
 fn _filtered_calls(query: String, mut calls: Calls) -> Result<Calls, Error> {
     let matcher = substreams::expr_matcher(&query);
 

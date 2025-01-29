@@ -43,7 +43,7 @@ fn filtered_events_and_calls(
     _filtered_events_and_calls(query, events, calls)
 }
 
-// _filtered_events_and_calls is equal to [filtered_events_and_calls] but exists only for unit testing purposes.
+/// _filtered_events_and_calls is equal to [filtered_events_and_calls] but exists only for unit testing purposes.
 fn _filtered_events_and_calls(
     query: String,
     mut events: Events,
@@ -77,7 +77,7 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
     _filtered_transactions(query, block)
 }
 
-// _filtered_transactions is equal to [filtered_transactions] but exists only for unit testing purposes.
+/// _filtered_transactions is equal to [filtered_transactions] but exists only for unit testing purposes.
 fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
     let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
     block.logs().for_each(|log| {
