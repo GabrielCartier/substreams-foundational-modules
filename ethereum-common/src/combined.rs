@@ -1,7 +1,7 @@
 use crate::calls::*;
 use crate::events::*;
 use crate::pb::sf::substreams::ethereum::v1::{
-    Call, Calls, Event, Events, EventsAndCalls, Transaction, Transactions,
+    Calls, Events, EventsAndCalls, Transaction, Transactions,
 };
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
