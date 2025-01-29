@@ -1,13 +1,13 @@
 use crate::calls::*;
 use crate::events::*;
 use crate::pb::sf::substreams::ethereum::v1::{
-    Call, Calls, Event, Events, EventsAndCalls, Transaction, Transactions,
+    Calls, Events, EventsAndCalls, Transaction, Transactions,
 };
-use substreams::pb::sf::substreams::index::v1::Keys;
 use crate::pb::sf::substreams::v1::Clock;
 use anyhow::Ok;
 use std::collections::HashMap;
 use substreams::errors::Error;
+use substreams::pb::sf::substreams::index::v1::Keys;
 use substreams::Hex;
 use substreams_ethereum::pb::eth::v2::{Block, Call as ethCall, Log};
 
@@ -40,39 +40,45 @@ fn filtered_events_and_calls(
     events: Events,
     calls: Calls,
 ) -> Result<EventsAndCalls, Error> {
-    let filtered_calls: Vec<Call> = calls
-        .calls
-        .into_iter()
-        .filter(|e| {
-            if let Some(call) = &e.call {
-                call_matches(call, &query).expect("matching calls from query")
-            } else {
-                false
-            }
-        })
-        .collect();
+    _filtered_events_and_calls(query, events, calls)
+}
 
-    let filtered_events: Vec<Event> = events
-        .events
-        .into_iter()
-        .filter(|e| {
-            if let Some(log) = &e.log {
-                evt_matches(log, &query).expect("matching calls from query")
-            } else {
-                false
-            }
-        })
-        .collect();
+/// _filtered_events_and_calls is equal to [filtered_events_and_calls] but exists only for unit testing purposes.
+fn _filtered_events_and_calls(
+    query: String,
+    mut events: Events,
+    mut calls: Calls,
+) -> Result<EventsAndCalls, Error> {
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+
+    calls.calls.retain(|call| {
+        let keys = call_keys(call.call.as_ref().unwrap());
+        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+        matcher.matches_keys(&keys)
+    });
+
+    events.events.retain(|event| {
+        let keys = evt_keys(event.log.as_ref().unwrap());
+        let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+        matcher.matches_keys(&keys)
+    });
 
     Ok(EventsAndCalls {
-        events: filtered_events,
-        calls: filtered_calls,
+        events: events.events,
+        calls: calls.calls,
         clock: calls.clock,
     })
 }
 
 #[substreams::handlers::map]
 fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
+    _filtered_transactions(query, block)
+}
+
+/// _filtered_transactions is equal to [filtered_transactions] but exists only for unit testing purposes.
+fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, Error> {
     let mut events: HashMap<String, Vec<&Log>> = HashMap::new();
     block.logs().for_each(|log| {
         let k = Hex::encode(&log.receipt.transaction.hash);
@@ -85,6 +91,8 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
         calls.entry(k).or_default().push(call.call);
     });
 
+    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
+
     let filtered: Vec<Transaction> = block
         .transaction_traces
         .iter()
@@ -94,7 +102,10 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
             let hash = Hex::encode(&tt.hash);
             if let Some(ev) = events.get(&hash) {
                 ev.iter().for_each(|log| {
-                    if evt_matches(&log, &query).expect("matching calls from query") {
+                    let keys = evt_keys(log);
+                    let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+                    if matcher.matches_keys(&keys) {
                         matched = true;
                         return;
                     }
@@ -102,7 +113,10 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
             };
             if let Some(ca) = calls.get(&hash) {
                 ca.iter().for_each(|call| {
-                    if call_matches(&call, &query).expect("matching calls from query") {
+                    let keys = call_keys(call);
+                    let keys = keys.iter().map(|k| k.as_str()).collect::<Vec<&str>>();
+
+                    if matcher.matches_keys(&keys) {
                         matched = true;
                         return;
                     };
@@ -131,4 +145,103 @@ fn filtered_transactions(query: String, block: Block) -> Result<Transactions, Er
         clock: clock,
         detail_level: block.detail_level,
     })
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+    use crate::testing;
+
+    #[test]
+    fn test_filtered_events_and_calls() {
+        // Given
+        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+
+        let events = Events {
+            events: block
+                .logs()
+                .map(|e| {
+                    return Event {
+                        tx_hash: "0x".to_owned(),
+                        log: Some(e.log.clone()),
+                    };
+                })
+                .collect(),
+            clock: None,
+        };
+
+        let calls = Calls {
+            calls: block
+                .calls()
+                .into_iter()
+                .map(|c| {
+                    return Call {
+                        tx_hash: "0x".to_owned(),
+                        call: Some(c.call.clone()),
+                    };
+                })
+                .collect(),
+            clock: None,
+        };
+
+        // When
+        let result = _filtered_events_and_calls(
+            "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
+                .to_owned(),
+            events,
+            calls,
+        )
+        .expect("Failed to execute function");
+
+        // Expect
+        assert!(result.events.len() > 0);
+        result.events.iter().for_each(|e| {
+            let address: &Vec<u8> = &e.log.as_ref().unwrap().address;
+
+            assert_eq!(
+                Hex::encode(address),
+                "6b175474e89094c44da98b954eedeac495271d0f"
+            );
+        });
+
+        result.calls.iter().for_each(|c| {
+            let input_bytes = &c.call.as_ref().unwrap().input;
+
+            assert_eq!(Hex::encode(&input_bytes[..4]), "029b2f34");
+        });
+    }
+
+    #[test]
+    fn test_filtered_transactions() {
+        // Given
+        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+
+        // When
+        let result = _filtered_transactions(
+            "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
+                .to_owned(),
+            block,
+        )
+        .expect("Failed to execute function");
+
+        // Expect
+        assert!(result.transactions.len() > 0);
+        result
+            .transactions
+            .into_iter()
+            .filter(|t| {
+                t.tx_hash == "0x1fa0d8efe5b3eececcb77df26075312f55355ce924d9a7f39362defb5d8fc424"
+            })
+            .for_each(|t| {
+                t.trace.unwrap().logs_with_calls().for_each(|lc| {
+                    let input_bytes = &lc.1.as_ref().input;
+
+                    assert_eq!(
+                        Hex::encode(&lc.0.address),
+                        "0x6b175474e89094c44da98b954eedeac495271d0f"
+                    );
+                    assert_eq!(Hex::encode(&input_bytes[..4]), "029b2f34");
+                });
+            });
+    }
 }
