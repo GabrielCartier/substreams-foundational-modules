@@ -35,26 +35,26 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+    file: ../target/wasm32-unknown-unknown/release/ethereum_common.wasm
 
 modules:
   - name: all_events
     kind: map
     inputs:
       - source: sf.ethereum.type.v2.Block
-    output: 
+    output:
       type: proto:sf.substreams.ethereum.v1.Events
     doc: |
-      `all_events` gives you all the events in a block (from successful transactions), with basic block hash/number/timestamp and transaction hash 
+      `all_events` gives you all the events in a block (from successful transactions), with basic block hash/number/timestamp and transaction hash
 
   - name: all_calls
     kind: map
     inputs:
       - source: sf.ethereum.type.v2.Block
-    output: 
+    output:
       type: proto:sf.substreams.ethereum.v1.Calls
     doc: |
-      `all_calls` gives you all the calls in a block (including internal calls), with basic block hash/number/timestamp and transaction hash 
+      `all_calls` gives you all the calls in a block (including internal calls), with basic block hash/number/timestamp and transaction hash
 
   - name: index_events
     kind: blockIndex

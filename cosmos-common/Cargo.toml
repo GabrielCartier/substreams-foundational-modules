@@ -1,29 +1,25 @@
 [package]
-name = "cosmos_common"
+name = "cosmos-common"
 version = "0.0.1"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[profile.release]
-lto = true
-opt-level = "z"
-strip = "debuginfo"
+description = "Foundational Substreams Modules for Cosmos Chains"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/cosmos-common"
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-substreams = "^0.6.0"
-hex = "0.4.3"
-prost = "0.13"
-prost-types = "0.13"
+anyhow = { workspace = true }
 cosmrs = { version = "0.16.0", features = ["cosmwasm"] }
-anyhow = "1.0"
+hex = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+substreams = { workspace = true }
 sha2 = "0.10.8"
 
 [dev-dependencies]
-base64 = "0.22.1"
-
-[target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.2", features = ["custom"] }
+base64 = { workspace = true }

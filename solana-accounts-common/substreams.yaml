@@ -9,7 +9,7 @@ package:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+    file: ../target/wasm32-unknown-unknown/release/solana_accounts_common.wasm
 
 network: solana-accounts-mainnet
 
@@ -35,7 +35,7 @@ modules:
       type: proto:sf.substreams.index.v1.Keys
     doc: |
       `index_accounts` will index the accounts by their address and owner as given in the account block
-      ex: `account:AwjomjhbNqkgEZN1ADvbEcTYsDfBuX4AKzNmxwgtKvxM`, `owner:stk17KkSJ7amyTVpGBHgo3Kcz52GjkzKYXuDwsFSk95`      
+      ex: `account:AwjomjhbNqkgEZN1ADvbEcTYsDfBuX4AKzNmxwgtKvxM`, `owner:stk17KkSJ7amyTVpGBHgo3Kcz52GjkzKYXuDwsFSk95`
 
   - name: filtered_accounts
     kind: map

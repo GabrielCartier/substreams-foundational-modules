@@ -17,8 +17,8 @@ package:
     * filtered_events_by_attribute_value
     * filtered_event_groups_by_attribute_value
 
-    They should be overriden by setting the blockFilter.Query.String parameter to a query that matches the event type 
-    and attribute keys only. See `derived-substreams-example.yaml` for an example 
+    They should be overriden by setting the blockFilter.Query.String parameter to a query that matches the event type
+    and attribute keys only. See `derived-substreams-example.yaml` for an example
     (https://github.com/streamingfast/substreams-foundational-modules/cosmos-common)
 
 imports:
@@ -35,7 +35,7 @@ protobuf:
 binaries:
   default:
     type: wasm/rust-v1
-    file: target/wasm32-unknown-unknown/release/cosmos_common.wasm
+    file: ../target/wasm32-unknown-unknown/release/cosmos_common.wasm
 
 modules:
   - name: all_events
@@ -55,7 +55,7 @@ modules:
       - map: all_events
     output:
       type: proto:sf.substreams.index.v1.Keys
-  
+
   - name: filtered_events
     kind: map
     blockFilter:
@@ -67,7 +67,7 @@ modules:
       - map: all_events
     output:
       type: proto:sf.substreams.cosmos.v1.EventList
-    
+
   - name: filtered_event_groups
     kind: map
     blockFilter:
@@ -79,7 +79,7 @@ modules:
       - map: all_events
     output:
       type: proto:sf.substreams.cosmos.v1.EventList
-    
+
   - name: filtered_events_by_attribute_value
     kind: map
     inputs:
@@ -87,7 +87,7 @@ modules:
       - map: all_events
     output:
       type: proto:sf.substreams.cosmos.v1.EventList
-    
+
   - name: filtered_event_groups_by_attribute_value
     kind: map
     inputs:
@@ -95,7 +95,7 @@ modules:
       - map: all_events
     output:
       type: proto:sf.substreams.cosmos.v1.EventList
-    
+
 params:
   filtered_events: "(type:message && attr:action) || (type:wasm && attr:_contract_address)"
   filtered_event_groups: "type:wasm && attr:_contract_address"

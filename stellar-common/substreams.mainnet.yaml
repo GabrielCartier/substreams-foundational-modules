@@ -24,7 +24,7 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+    file: ../target/wasm32-unknown-unknown/release/stellar_common.wasm
 
 network: stellar-mainnet
 

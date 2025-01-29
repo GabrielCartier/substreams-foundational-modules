@@ -28,7 +28,7 @@ protobuf:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+    file: ../target/wasm32-unknown-unknown/release/solana_common.wasm
 
 modules:
   - name: blocks_without_votes
