@@ -22,6 +22,12 @@ protobuf:
     - sf/substreams/ethereum/v1/transaction.proto
   importPaths:
     - ./proto
+  excludePaths:
+    - sf/substreams/index
+    - sf/substreams/rpc
+    - sf/substreams/sink
+    - sf/substreams/v1
+    - google
 
 imports:
   ethereum: https://github.com/streamingfast/firehose-ethereum/releases/download/v1.4.8/ethereum-v1.0.0.spkg
