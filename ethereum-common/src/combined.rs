@@ -157,39 +157,12 @@ pub mod tests {
         // Given
         let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
-        let events = Events {
-            events: block
-                .logs()
-                .map(|e| {
-                    return Event {
-                        tx_hash: "0x".to_owned(),
-                        log: Some(e.log.clone()),
-                    };
-                })
-                .collect(),
-            clock: None,
-        };
-
-        let calls = Calls {
-            calls: block
-                .calls()
-                .into_iter()
-                .map(|c| {
-                    return Call {
-                        tx_hash: "0x".to_owned(),
-                        call: Some(c.call.clone()),
-                    };
-                })
-                .collect(),
-            clock: None,
-        };
-
         // When
         let result = _filtered_events_and_calls(
             "evt_addr:0x6b175474e89094c44da98b954eedeac495271d0f || call_method:0x029b2f34"
                 .to_owned(),
-            events,
-            calls,
+            _all_events(block.clone()).unwrap(),
+            _all_calls(block).unwrap(),
         )
         .expect("Failed to execute function");
 

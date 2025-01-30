@@ -8,6 +8,7 @@ fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::E
     return _blocks_without_votes(block);
 }
 
+/// blocks_without_votes is equal to [blocks_without_votes] but exists only for unit testing purposes.
 pub fn _blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
     block.transactions.retain(|trx| {
         let meta = match trx.meta.as_ref() {
@@ -30,7 +31,7 @@ pub fn _blocks_without_votes(mut block: Block) -> Result<Block, substreams::erro
 
     Ok(block)
 }
-
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::testing;
