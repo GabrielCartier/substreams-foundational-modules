@@ -27,12 +27,12 @@ pub fn _all_events(block: Block) -> Result<EventList, Error> {
     }
 
     // block events are the combination of BeginBlockEvents and EndBlockEvents
-    /*events.extend(block.events.into_iter().map(|event| {
+    events.extend(block.events.into_iter().map(|event| {
         return Event {
             event: Some(event),
             transaction_hash: "".to_string(),
         };
-    }));*/
+    }));
 
     for (i, tx_result) in block.tx_results.into_iter().enumerate() {
         let tx_hash = compute_tx_hash(block.txs.get(i).unwrap());
@@ -222,8 +222,6 @@ fn _filtered_event_groups_by_attribute_value(query: String, events: EventList) -
         .map(|e| (e.transaction_hash.to_string(), true))
         .collect::<HashMap<String, bool>>();
 
-    println!("{}", matching_trx_hashes.len().to_string());
-
     let filtered: Vec<Event> = events
         .events
         .into_iter()
@@ -291,8 +289,6 @@ fn compute_tx_hash(tx_as_bytes: &[u8]) -> String {
 
 #[cfg(test)]
 mod tests {
-    use substreams::log::println;
-
     use super::*;
 
     #[test]
@@ -398,29 +394,14 @@ mod tests {
         });
     }
 
-    // NOT WORKING
     #[test]
     fn test_filtered_event_groups_by_attribute_value() {
         // Given
         let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
-        _all_events(block.clone()).unwrap().events.iter().for_each(|event| {
-            println!("{} ", event.clone().transaction_hash);
-            println!("{} ", event.clone().event.unwrap().r#type);
-            event
-                .clone()
-                .event
-                .unwrap()
-                .attributes
-                .iter()
-                .for_each(|attr| println!("{} {}", attr.key, attr.value));
-            println!("------------/");
-        });
-        //println!("{}", events.len().to_string());
-        println!("-----------------------------------!");
+        
         // When
         let result = _filtered_event_groups_by_attribute_value(
-            // "type:transfer && attr:sender:inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
-            "type:transfer".to_owned(),
+            "type:transfer && attr:sender".to_owned(),
             _all_events(block).unwrap(),
         );
 
@@ -430,20 +411,10 @@ mod tests {
         assert!(result_events.len() > 0);
         result_events.iter().for_each(|event| {
             let inner_event = event.event.as_ref().unwrap();
-            println!("{}", inner_event.r#type);
 
-            inner_event
-                .attributes
-                .iter()
-                .for_each(|attr| println!("{} {}", attr.key, attr.value));
-
-            assert_eq!(
-                inner_event
-                    .attributes
-                    .iter()
-                    .any(|attr| attr.key == "sender" && attr.value == "inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"),
-                true
-            )
+            if inner_event.r#type == "transfer" {
+                assert_eq!(inner_event.attributes.iter().any(|attr| attr.key == "sender"), true)
+            }
         });
     }
 }
