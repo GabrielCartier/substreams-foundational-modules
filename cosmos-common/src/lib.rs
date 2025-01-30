@@ -4,108 +4,20 @@ mod testing;
 use core::panic;
 use std::collections::HashMap;
 
-use crate::pb::cosmos::authz::v1beta1::MsgExec;
-use crate::pb::cosmos::bank::v1beta1::MsgMultiSend;
-use crate::pb::cosmos::bank::v1beta1::MsgSend;
-use crate::pb::cosmos::crisis::v1beta1::MsgVerifyInvariant;
-use crate::pb::cosmos::distribution::v1beta1::MsgFundCommunityPool;
-use crate::pb::cosmos::distribution::v1beta1::MsgSetWithdrawAddress;
-use crate::pb::cosmos::distribution::v1beta1::MsgWithdrawDelegatorReward;
-use crate::pb::cosmos::distribution::v1beta1::MsgWithdrawValidatorCommission;
-use crate::pb::cosmos::evidence::v1beta1::MsgSubmitEvidence;
-use crate::pb::cosmos::gov::v1beta1::MsgDeposit;
-use crate::pb::cosmos::gov::v1beta1::MsgSubmitProposal;
-use crate::pb::cosmos::gov::v1beta1::MsgVote;
-use crate::pb::cosmos::slashing::v1beta1::MsgUnjail;
-use crate::pb::cosmos::tx::v1beta1::Tx;
 use crate::pb::sf::cosmos::r#type::v2::Block;
 use anyhow::anyhow;
-use pb::cosmwasm::wasm::v1::MsgExecuteContract;
-use pb::ibc::core::channel::v1::MsgAcknowledgement;
-use pb::ibc::core::client::v1::MsgUpdateClient;
-use pb::injective::auction::v1beta1::MsgBid;
-use pb::injective::exchange::v1beta1::MsgBatchUpdateOrders;
-use pb::injective::exchange::v1beta1::MsgDeposit as InjMsgDeposit;
-use pb::injective::oracle::v1beta1::MsgRelayProviderPrices;
-use pb::injective::peggy::v1::MsgRequestBatch;
-use pb::injective::wasmx::v1::MsgExecuteContractCompat;
-use pb::injective::wasmx::v1::MsgRegisterContract;
-use pb::sf::substreams::cosmos::v1::transaction::message::Value;
-use pb::sf::substreams::cosmos::v1::transaction::Message;
 use pb::sf::substreams::cosmos::v1::*;
 use pb::sf::substreams::v1::Clock;
-use prost_types::Any;
 use sha2::{Digest, Sha256};
 use substreams::errors::Error;
-use substreams::key;
-use substreams::log;
 use substreams::pb::sf::substreams::index::v1::Keys;
-
-// #[substreams::handlers::map]
-// pub fn all_transactions(block: Block) -> Result<TransactionList, Error> {
-//     // Mutable list to add the output of the Substreams
-//     let mut transactions: Vec<Transaction> = Vec::new();
-//
-//     if block.txs.len() != block.tx_results.len() {
-//         return Err(anyhow!("Transaction list and result list do not match"));
-//     }
-//
-//     for i in 0..block.txs.len() {
-//         let tx_as_bytes = block.txs.get(i).unwrap();
-//         let tx_as_u8 = &tx_as_bytes[..];
-//
-//         let tx_result = block.tx_results.get(i).unwrap();
-//         // substreams::log::println("00-----------------");
-//
-//         if let Ok(tx) = <Tx as prost::Message>::decode(tx_as_u8) {
-//             if let Some(body) = tx.body {
-//                 let transaction_memo = body.memo;
-//                 let transaction_timeout_height = body.timeout_height;
-//                 let transaction_extension_options = body.extension_options;
-//                 let transaction_non_critical_extension_options = body.non_critical_extension_options;
-//                 // substreams::log::println("A-----------------");
-//
-//                 let messages = extract_messages(body.messages);
-//                 // substreams::log::println("I-----------------");
-//                 // substreams::log::println(messages.len().to_string());
-//
-//                 let transaction = Transaction {
-//                     raw_tx: tx_as_bytes.to_vec(),
-//                     hash: compute_tx_hash(tx_as_bytes),
-//                     memo: transaction_memo,
-//                     messages: messages,
-//                     timeout_height: transaction_timeout_height,
-//                     extension_options: transaction_extension_options,
-//                     non_critical_extension_options: transaction_non_critical_extension_options,
-//                     result_code: tx_result.code,
-//                     result_data: tx_result.data.to_vec(),
-//                     result_log: tx_result.log.to_string(),
-//                     result_info: tx_result.info.to_string(),
-//                     result_gas_wanted: tx_result.gas_wanted,
-//                     result_gas_used: tx_result.gas_used,
-//                     result_events: tx_result.events.to_vec(),
-//                     result_codespace: tx_result.codespace.to_string(),
-//                     auth_info: tx.auth_info,
-//                     signatures: tx.signatures,
-//                 };
-//
-//                 transactions.push(transaction);
-//             }
-//         }
-//     }
-//
-//     Ok(TransactionList {
-//         transactions: transactions,
-//         clock: Some(Clock {
-//             id: hex::encode(block.hash),
-//             number: block.height as u64,
-//             timestamp: block.time,
-//         }),
-//     })
-// }
 
 #[substreams::handlers::map]
 pub fn all_events(block: Block) -> Result<EventList, Error> {
+    _all_events(block)
+}
+
+pub fn _all_events(block: Block) -> Result<EventList, Error> {
     // Mutable list to add the output of the Substreams
     let mut events: Vec<Event> = Vec::new();
 
@@ -240,49 +152,6 @@ fn _filtered_event_groups(query: String, events: EventList) -> Result<EventList,
         clock: events.clock,
     })
 }
-
-// #[substreams::handlers::map]
-// fn filtered_trx_by_events(query: String, trxs: TransactionList) -> Result<TransactionList, Error> {
-//     let events = trxs.transactions.iter().map(|t| {
-//         t.result_events.iter().map(|e| {
-//             Event {
-//                 transaction_hash: t.hash.clone(),
-//                 event: Some(e.clone()),
-//             }
-//         })
-//     }).flatten().collect::<Vec<_>>();
-//
-//     let matching_trx_hashes= events
-//         .iter()
-//         .filter(|e| {
-//             if let Some(ev) = &e.event {
-//                 let mut keys = Vec::new();
-//                 keys.push(format!("type:{}", ev.r#type.clone()));
-//                 ev.attributes.iter().for_each(|attr| {
-//                     keys.push(format!("attr:{}", attr.key));
-//                 });
-//                 matches_keys_in_parsed_expr(&keys, &query).expect("matching events from query")
-//             } else {
-//                 false
-//             }
-//         })
-//         .map(|e| (e.transaction_hash.to_string(), true))
-//         .collect::<HashMap<String, bool>>();
-//
-//     let transactions: Vec<Transaction> = trxs
-//         .transactions
-//         .into_iter()
-//         .filter(|t| matching_trx_hashes.contains_key(t.hash.as_str()))
-//         .collect();
-//
-//     if transactions.len() == 0 {
-//         return Ok(TransactionList::default());
-//     }
-//     Ok(TransactionList {
-//         transactions: transactions,
-//         clock: trxs.clock,
-//     })
-// }
 
 #[substreams::handlers::map]
 fn filtered_events_by_attribute_value(query: String, events: EventList) -> Result<EventList, Error> {
@@ -677,13 +546,11 @@ mod tests {
         });
     }
 
-    /*
     // NOT WORKING
     #[test]
     fn test_filtered_event_groups_by_attribute_value() {
         // Given
         let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
-        block.events.iter().for_each(|evt| println!("{}", evt.r#type));
 
         //println!("{}", events.len().to_string());
         println!("-----------------------------------!");
@@ -691,17 +558,7 @@ mod tests {
         let result = _filtered_event_groups_by_attribute_value(
             // "type:transfer && attr:sender:inj14vnmw2wee3xtrsqfvpcqg35jg9v7j2vdpzx0kk"
             "type:transfer".to_owned(),
-            EventList {
-                clock: None,
-                events: block
-                    .events
-                    .iter()
-                    .map(|evt| Event {
-                        transaction_hash: "0x".to_owned(),
-                        event: Some(evt.clone()),
-                    })
-                    .collect(),
-            },
+            _all_events(block).unwrap(),
         );
 
         // Expect
@@ -725,5 +582,5 @@ mod tests {
                 true
             )
         });
-    }*/
+    }
 }
