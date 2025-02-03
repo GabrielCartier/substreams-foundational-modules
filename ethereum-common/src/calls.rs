@@ -96,10 +96,7 @@ pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
 pub mod tests {
     use super::*;
 
-    use crate::{
-        pb::sf::substreams::ethereum::v1::{Call, Calls},
-        testing,
-    };
+    use crate::testing;
 
     #[test]
     fn test_all_calls() {

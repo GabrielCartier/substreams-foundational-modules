@@ -5,7 +5,7 @@ static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote1111111111111111111111111111111111
 
 #[substreams::handlers::map]
 fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
-    return _blocks_without_votes(block);
+    _blocks_without_votes(block)
 }
 
 /// blocks_without_votes is equal to [blocks_without_votes] but exists only for unit testing purposes.
