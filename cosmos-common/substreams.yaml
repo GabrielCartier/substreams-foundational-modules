@@ -21,9 +21,16 @@ package:
     and attribute keys only. See `derived-substreams-example.yaml` for an example 
     (https://github.com/streamingfast/substreams-foundational-modules/cosmos-common)
 
+imports:
+  cosmos: https://github.com/streamingfast/substreams-cosmos/releases/download/v0.1.5/cosmos-v0.1.5.spkg
+
 protobuf:
-  descriptorSets:
-  - localPath: generated-buf-build.binpb
+  files:
+    - proto/cosmos/v1/events.proto
+  importPaths:
+    - ./proto
+  excludePaths:
+    - google
 
 binaries:
   default:

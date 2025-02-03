@@ -1,4 +1,5 @@
 mod pb;
+#[cfg(test)]
 mod testing;
 
 use core::panic;
@@ -237,49 +238,6 @@ fn _filtered_event_groups_by_attribute_value(query: String, events: EventList) -
     })
 }
 
-#[substreams::handlers::map]
-fn filtered_trx_by_events_attribute_value(
-    query: String,
-    events: EventList,
-    trxs: TransactionList,
-) -> Result<TransactionList, Error> {
-    let matcher: substreams::ExprMatcher<'_> = substreams::expr_matcher(&query);
-
-    let matching_trx_hashes = events
-        .events
-        .iter()
-        .filter(|e| {
-            if let Some(ev) = &e.event {
-                let mut keys = Vec::new();
-                keys.push(format!("type:{}", ev.r#type.clone()));
-                ev.attributes.iter().for_each(|attr| {
-                    keys.push(format!("attr:{}", attr.key));
-                    keys.push(format!("attr:{}:{}", attr.key, attr.value));
-                });
-
-                matcher.matches_keys(&keys)
-            } else {
-                false
-            }
-        })
-        .map(|e| (e.transaction_hash.to_string(), true))
-        .collect::<HashMap<String, bool>>();
-
-    let transactions: Vec<Transaction> = trxs
-        .transactions
-        .into_iter()
-        .filter(|t| matching_trx_hashes.contains_key(t.hash.as_str()))
-        .collect();
-
-    if transactions.len() == 0 {
-        return Ok(TransactionList::default());
-    }
-    Ok(TransactionList {
-        transactions: transactions,
-        clock: trxs.clock,
-    })
-}
-
 fn compute_tx_hash(tx_as_bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(tx_as_bytes);
@@ -398,7 +356,7 @@ mod tests {
     fn test_filtered_event_groups_by_attribute_value() {
         // Given
         let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
-        
+
         // When
         let result = _filtered_event_groups_by_attribute_value(
             "type:transfer && attr:sender".to_owned(),

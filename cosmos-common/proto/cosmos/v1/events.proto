@@ -3,7 +3,6 @@ syntax = "proto3";
 package sf.substreams.cosmos.v1;
 
 import "sf/substreams/v1/clock.proto";
-import "cosmwasm/wasm/v1/tx.proto";
 import "sf/cosmos/type/v2/block.proto";
 
 message EventList {
