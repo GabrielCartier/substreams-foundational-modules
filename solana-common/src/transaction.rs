@@ -1,4 +1,6 @@
-use crate::pb::sf::substreams::solana::v1::Transactions;
+use crate::{
+    keys::transaction_program_and_account_keys, pb::sf::substreams::solana::v1::Transactions,
+};
 use substreams_solana::pb::sf::solana::r#type::v1::Block;
 
 #[substreams::handlers::map]
@@ -48,16 +50,9 @@ fn _transactions_by_programid_and_account_without_votes(
     };
 
     transactions.transactions.retain(|trx| {
-        trx.walk_instructions().any(|view| {
-            query.matches_keys(
-                &view
-                    .accounts()
-                    .iter()
-                    .map(|acc| format!("account:{}", acc))
-                    .chain(vec![format!("program:{}", view.program_id())])
-                    .collect::<Vec<String>>(),
-            )
-        })
+        let keys: Vec<_> = transaction_program_and_account_keys(trx).collect();
+
+        query.matches_keys(&keys)
     });
 
     Ok(transactions)
