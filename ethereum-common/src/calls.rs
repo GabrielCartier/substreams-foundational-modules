@@ -11,9 +11,8 @@ fn all_calls(blk: Block) -> Result<Calls, Error> {
     _all_calls(blk)
 }
 
-
 /// _all_calls is equal to [all_calls] but exists only for unit testing purposes.
-fn _all_calls(blk: Block) -> Result<Calls, Error> {
+pub fn _all_calls(blk: Block) -> Result<Calls, Error> {
     let clock = Clock {
         timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
         id: Hex::encode(&blk.hash),
@@ -97,10 +96,7 @@ pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
 pub mod tests {
     use super::*;
 
-    use crate::{
-        pb::sf::substreams::ethereum::v1::{Call, Calls},
-        testing,
-    };
+    use crate::testing;
 
     #[test]
     fn test_all_calls() {
@@ -115,24 +111,10 @@ pub mod tests {
         // Given
         let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
-        let calls_obj = Calls {
-            calls: block
-                .calls()
-                .into_iter()
-                .map(|c| {
-                    return Call {
-                        tx_hash: "0x".to_owned(),
-                        call: Some(c.call.clone()),
-                    };
-                })
-                .collect(),
-            clock: None,
-        };
-
         // When
         let result = _filtered_calls(
             "call_from:0x5acc84a3e955bdd76467d3348077d003f00ffb97".to_owned(),
-            calls_obj,
+            _all_calls(block).unwrap(),
         )
         .expect("Failed to execute function");
 

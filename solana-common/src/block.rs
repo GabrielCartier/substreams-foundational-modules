@@ -5,6 +5,11 @@ static VOTE_INSTRUCTION: [u8; 32] = b58!("Vote1111111111111111111111111111111111
 
 #[substreams::handlers::map]
 fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
+    _blocks_without_votes(block)
+}
+
+/// blocks_without_votes is equal to [blocks_without_votes] but exists only for unit testing purposes.
+pub fn _blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::Error> {
     block.transactions.retain(|trx| {
         let meta = match trx.meta.as_ref() {
             Some(meta) => meta,
@@ -25,4 +30,33 @@ fn blocks_without_votes(mut block: Block) -> Result<Block, substreams::errors::E
     });
 
     Ok(block)
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing;
+
+    #[test]
+    fn test_block_without_votes() {
+        // Given
+        let block = testing::read_block("testdata/solana_mainnet_313000000.binpb.base64");
+
+        // When
+        let result = _blocks_without_votes(block).expect("Failed to execute function");
+
+        // Expect
+        result.transactions().for_each(|t| {
+            assert_eq!(
+                t.transaction
+                    .clone()
+                    .unwrap()
+                    .message
+                    .unwrap()
+                    .account_keys
+                    .iter()
+                    .all(|acct| acct != &VOTE_INSTRUCTION),
+                true
+            )
+        });
+    }
 }

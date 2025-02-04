@@ -8,6 +8,11 @@ use substreams_ethereum::pb::eth::v2::Block;
 
 #[substreams::handlers::map]
 fn all_events(blk: Block) -> Result<Events, Error> {
+    _all_events(blk)
+}
+
+/// _all_events is equal to [all_events] but exists only for unit testing purposes.
+pub fn _all_events(blk: Block) -> Result<Events, Error> {
     let clock = Clock {
         timestamp: Some(blk.header.unwrap().timestamp.unwrap()),
         id: Hex::encode(&blk.hash),
@@ -92,23 +97,10 @@ pub mod tests {
         // Given
         let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
 
-        let events: Vec<Event> = block
-            .logs()
-            .map(|e| {
-                return Event {
-                    tx_hash: "0x".to_owned(),
-                    log: Some(e.log.clone()),
-                };
-            })
-            .collect();
-
         // When
         let result = _filtered_events(
             "evt_addr:0x5acc84a3e955bdd76467d3348077d003f00ffb97".to_owned(),
-            Events {
-                events: events,
-                clock: None,
-            },
+            _all_events(block).unwrap(),
         )
         .expect("Failed to execute function");
 
