@@ -280,6 +280,7 @@ dependencies = [
  "anyhow",
  "base64",
  "cosmrs",
+ "getrandom 0.2.15",
  "hex",
  "prost 0.13.4",
  "prost-types 0.13.4",
@@ -1786,13 +1787,25 @@ dependencies = [
  "anyhow",
  "base64",
  "five8",
- "getrandom 0.2.15",
  "num-bigint",
  "prost 0.13.4",
  "prost-types 0.13.4",
  "substreams 0.6.0",
  "substreams-solana",
- "substreams-solana-program-instructions",
+]
+
+[[package]]
+name = "solana-common"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "bs58 0.4.0",
+ "num-bigint",
+ "prost 0.13.4",
+ "prost-types 0.13.4",
+ "substreams 0.6.0",
+ "substreams-solana",
 ]
 
 [[package]]
@@ -2024,47 +2037,36 @@ dependencies = [
 
 [[package]]
 name = "substreams-solana"
-version = "0.13.0"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c760a43481d47c5e089af56ae4370286763bac708cdb1e55feb03b4efbea135f"
+checksum = "9bc14193c089465f3318be2215a90803e0bf2f16477557142648dbbe451ad6bc"
 dependencies = [
  "anyhow",
  "num_enum",
- "substreams 0.5.22",
+ "substreams 0.6.0",
  "substreams-solana-core",
  "substreams-solana-macro",
 ]
 
 [[package]]
 name = "substreams-solana-core"
-version = "0.13.0"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4d3aae508c9e574a48f833228e429720943527c72d5fd393ec35b1cb6139535"
+checksum = "d858d6d9568136744ee82cf0bd01a3f610a4a929b801b40b1934b6199c723520"
 dependencies = [
  "bs58 0.4.0",
- "prost 0.11.9",
- "prost-build 0.11.9",
- "prost-types 0.11.9",
+ "prost 0.13.4",
+ "prost-build 0.13.4",
+ "prost-types 0.13.4",
 ]
 
 [[package]]
 name = "substreams-solana-macro"
-version = "0.13.0"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4abe3f6ce8ea4956a6d2461be3fe813cf36e1f45aa18996bba0813c07e210a1d"
+checksum = "d28bba84dc05f4644ef9d1505162c4628f8fce2436bb15c047d0df3911dad142"
 dependencies = [
  "bs58 0.4.0",
-]
-
-[[package]]
-name = "substreams-solana-program-instructions"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2d2eac3fee28a079bd3af5573bb6d43cf9667d89ce577fc7dd40113bb31e9e1"
-dependencies = [
- "anyhow",
- "num_enum",
- "substreams 0.5.22",
 ]
 
 [[package]]

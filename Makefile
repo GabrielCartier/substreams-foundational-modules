@@ -8,5 +8,6 @@ package: build
 	for project in $$projects; do \
 		echo "Substreams packing $$project..."; \
 		pushd $$project > /dev/null; \
+		substreams build; \
 		popd > /dev/null; \
 	done

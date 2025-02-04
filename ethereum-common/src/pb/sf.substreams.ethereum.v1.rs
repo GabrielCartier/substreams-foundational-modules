@@ -3,61 +3,61 @@
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Calls {
-    #[prost(message, optional, tag = "1")]
+    #[prost(message, optional, tag="1")]
     pub clock: ::core::option::Option<super::super::v1::Clock>,
-    #[prost(message, repeated, tag = "3")]
+    #[prost(message, repeated, tag="3")]
     pub calls: ::prost::alloc::vec::Vec<Call>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Call {
-    #[prost(message, optional, tag = "1")]
+    #[prost(message, optional, tag="1")]
     pub call: ::core::option::Option<::substreams_ethereum::pb::eth::v2::Call>,
-    #[prost(string, tag = "2")]
+    #[prost(string, tag="2")]
     pub tx_hash: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Events {
-    #[prost(message, optional, tag = "1")]
+    #[prost(message, optional, tag="1")]
     pub clock: ::core::option::Option<super::super::v1::Clock>,
-    #[prost(message, repeated, tag = "2")]
+    #[prost(message, repeated, tag="2")]
     pub events: ::prost::alloc::vec::Vec<Event>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Event {
-    #[prost(message, optional, tag = "1")]
+    #[prost(message, optional, tag="1")]
     pub log: ::core::option::Option<::substreams_ethereum::pb::eth::v2::Log>,
-    #[prost(string, tag = "2")]
+    #[prost(string, tag="2")]
     pub tx_hash: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EventsAndCalls {
-    #[prost(message, optional, tag = "1")]
+    #[prost(message, optional, tag="1")]
     pub clock: ::core::option::Option<super::super::v1::Clock>,
-    #[prost(message, repeated, tag = "2")]
+    #[prost(message, repeated, tag="2")]
     pub events: ::prost::alloc::vec::Vec<Event>,
-    #[prost(message, repeated, tag = "3")]
+    #[prost(message, repeated, tag="3")]
     pub calls: ::prost::alloc::vec::Vec<Call>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transactions {
-    #[prost(message, repeated, tag = "1")]
+    #[prost(message, repeated, tag="1")]
     pub transactions: ::prost::alloc::vec::Vec<Transaction>,
-    #[prost(message, optional, tag = "2")]
+    #[prost(message, optional, tag="2")]
     pub clock: ::core::option::Option<super::super::v1::Clock>,
-    #[prost(enumeration = "DetailLevel", tag = "3")]
+    #[prost(enumeration="DetailLevel", tag="3")]
     pub detail_level: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transaction {
-    #[prost(message, optional, tag = "1")]
+    #[prost(message, optional, tag="1")]
     pub trace: ::core::option::Option<::substreams_ethereum::pb::eth::v2::TransactionTrace>,
-    #[prost(string, tag = "2")]
+    #[prost(string, tag="2")]
     pub tx_hash: ::prost::alloc::string::String,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

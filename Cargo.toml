@@ -4,6 +4,7 @@ members = [
     "cosmos-common",
     "ethereum-common",
     "solana-accounts-common",
+    "solana-common",
     "stellar-common",
 ]
 resolver = "2"

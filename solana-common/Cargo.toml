@@ -17,12 +17,7 @@ num-bigint = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
 substreams = { workspace = true }
-# Use latest from https://crates.io/crates/substreams-solana
-substreams-solana = "0.13"
-substreams-solana-program-instructions = "0.1"
-
-[target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.2", features = ["custom"] }
+substreams-solana = "0.14"
 
 [dev-dependencies]
 base64 = { workspace = true }
