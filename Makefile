@@ -11,3 +11,7 @@ package: build
 		substreams build; \
 		popd > /dev/null; \
 	done
+
+.PHONY: format
+format:
+	cargo fmt

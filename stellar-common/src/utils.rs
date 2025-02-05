@@ -1,8 +1,8 @@
 use core::panic;
 use std::io::Cursor;
 use stellar_xdr::curr::{
-    AccountMergeResult, Limited, Limits, ReadXdr, Transaction, TransactionEnvelope, TransactionMeta, TransactionMetaV3,
-    TransactionResult, TransactionResultResult,
+    AccountMergeResult, Limited, Limits, ReadXdr, Transaction, TransactionEnvelope,
+    TransactionMeta, TransactionMetaV3, TransactionResult, TransactionResultResult,
 };
 
 use crate::constants;
@@ -34,7 +34,9 @@ pub fn decode_transaction(
     return Ok(trx_v1.tx);
 }
 
-pub fn decode_transaction_result(result_xdr: &Vec<u8>) -> Result<TransactionResult, stellar_xdr::curr::Error> {
+pub fn decode_transaction_result(
+    result_xdr: &Vec<u8>,
+) -> Result<TransactionResult, stellar_xdr::curr::Error> {
     let buf = Cursor::new(result_xdr);
     let transaction_result = TransactionResult::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_result
@@ -59,13 +61,18 @@ pub fn decode_account_merge_result(transaction_result: &TransactionResult) -> Op
     }
 }
 
-fn decode_transaction_envelope(envelope_xdr: &Vec<u8>) -> Result<TransactionEnvelope, stellar_xdr::curr::Error> {
+fn decode_transaction_envelope(
+    envelope_xdr: &Vec<u8>,
+) -> Result<TransactionEnvelope, stellar_xdr::curr::Error> {
     let buf = Cursor::new(envelope_xdr);
-    let transaction_envelope = TransactionEnvelope::read_xdr(&mut Limited::new(buf, Limits::none()));
+    let transaction_envelope =
+        TransactionEnvelope::read_xdr(&mut Limited::new(buf, Limits::none()));
     transaction_envelope
 }
 
-pub fn decode_transaction_meta(result_meta_xdr: &Vec<u8>) -> Result<TransactionMetaV3, stellar_xdr::curr::Error> {
+pub fn decode_transaction_meta(
+    result_meta_xdr: &Vec<u8>,
+) -> Result<TransactionMetaV3, stellar_xdr::curr::Error> {
     let buf = Cursor::new(result_meta_xdr);
     let transaction_meta = TransactionMeta::read_xdr(&mut Limited::new(buf, Limits::none()));
     match transaction_meta {
@@ -90,7 +97,9 @@ pub fn match_asset_code(asset: &stellar_xdr::curr::Asset) -> String {
     }
 }
 
-pub fn match_change_trust_op_asset(change_trust_op_asset: &stellar_xdr::curr::ChangeTrustAsset) -> String {
+pub fn match_change_trust_op_asset(
+    change_trust_op_asset: &stellar_xdr::curr::ChangeTrustAsset,
+) -> String {
     match change_trust_op_asset {
         stellar_xdr::curr::ChangeTrustAsset::Native => "XLM".to_string(),
         stellar_xdr::curr::ChangeTrustAsset::CreditAlphanum4(credit) => {
@@ -114,11 +123,15 @@ pub fn fetch_asset_issuer(asset: &stellar_xdr::curr::Asset) -> String {
     }
 }
 
-pub fn fetch_change_trust_op_asset_issuer(change_trust_op_asset: &stellar_xdr::curr::ChangeTrustAsset) -> String {
+pub fn fetch_change_trust_op_asset_issuer(
+    change_trust_op_asset: &stellar_xdr::curr::ChangeTrustAsset,
+) -> String {
     match change_trust_op_asset {
         stellar_xdr::curr::ChangeTrustAsset::Native => constants::XLM_SOURCE_ACCOUNT.to_string(),
         stellar_xdr::curr::ChangeTrustAsset::CreditAlphanum4(credit) => credit.issuer.0.to_string(),
-        stellar_xdr::curr::ChangeTrustAsset::CreditAlphanum12(credit) => credit.issuer.0.to_string(),
+        stellar_xdr::curr::ChangeTrustAsset::CreditAlphanum12(credit) => {
+            credit.issuer.0.to_string()
+        }
         stellar_xdr::curr::ChangeTrustAsset::PoolShare(_) => {
             substreams::log::println("PoolShare asset type not supported yet");
             "".to_string()

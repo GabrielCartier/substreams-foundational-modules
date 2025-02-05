@@ -19,10 +19,11 @@ fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
             return;
         }
 
-        let decoded_transaction = match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
-            Ok(trx) => trx,
-            Err(_) => return,
-        };
+        let decoded_transaction =
+            match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
+                Ok(trx) => trx,
+                Err(_) => return,
+            };
 
         decoded_transaction
             .operations
@@ -32,7 +33,8 @@ fn map_created_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
                     accounts.accounts.push(Account {
                         trx_hash: hash.clone(),
                         address: create_account.destination.to_string(),
-                        balance: (create_account.starting_balance as f64) / constants::XLM_DENOMINATOR,
+                        balance: (create_account.starting_balance as f64)
+                            / constants::XLM_DENOMINATOR,
                     });
                 }
                 _ => {}
@@ -52,10 +54,11 @@ fn map_deleted_accounts(block: Block) -> Result<Accounts, substreams::errors::Er
             return;
         }
 
-        let decoded_transaction_meta = match utils::decode_transaction_meta(&transaction.result_meta_xdr) {
-            Ok(trx) => trx,
-            Err(_) => return,
-        };
+        let decoded_transaction_meta =
+            match utils::decode_transaction_meta(&transaction.result_meta_xdr) {
+                Ok(trx) => trx,
+                Err(_) => return,
+            };
 
         for operation_meta in decoded_transaction_meta.operations.as_vec() {
             for change in operation_meta.changes.0.as_vec() {

@@ -110,7 +110,8 @@ mod tests {
 
             // Check if the given program id is contained within the instructions.
             if !transaction.walk_instructions().any(|instruction| {
-                instruction.program_id().to_string() == "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+                instruction.program_id().to_string()
+                    == "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
             }) {
                 matched = false
             }
@@ -119,13 +120,13 @@ mod tests {
             transaction
                 .walk_instructions()
                 .filter(|instruction| {
-                    instruction.program_id().to_string() == "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+                    instruction.program_id().to_string()
+                        == "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
                 })
                 .for_each(|instruction| {
-                    matched = instruction
-                        .accounts()
-                        .iter()
-                        .any(|account| account.to_string() == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc")
+                    matched = instruction.accounts().iter().any(|account| {
+                        account.to_string() == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc"
+                    })
                 });
 
             assert_eq!(matched, true)

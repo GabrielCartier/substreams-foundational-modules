@@ -14,14 +14,16 @@ fn index_accounts(account_block: AccountBlock) -> Result<Keys, substreams::error
     account_block.accounts.iter().for_each(|account| {
         if !account_map.contains_key(&account.address) {
             let len = five8::encode_32(to_32_array(account.address.as_slice()), &mut buf);
-            let key = "account:".to_string() + unsafe{str::from_utf8_unchecked(&buf[..len as usize])};
+            let key =
+                "account:".to_string() + unsafe { str::from_utf8_unchecked(&buf[..len as usize]) };
             account_map.insert(account.address.clone(), ());
             keys.keys.push(key);
         }
 
         if !owner_map.contains_key(&account.owner) {
             let len = five8::encode_32(to_32_array(account.owner.as_slice()), &mut buf);
-            let key = "owner:".to_string() + unsafe{str::from_utf8_unchecked(&buf[..len as usize])};
+            let key =
+                "owner:".to_string() + unsafe { str::from_utf8_unchecked(&buf[..len as usize]) };
             owner_map.insert(account.owner.clone(), ());
             keys.keys.push(key);
         }
@@ -41,9 +43,11 @@ fn filtered_accounts(
     let mut buf = [0u8; 44];
     accounts.retain(|account| {
         let len = five8::encode_32(to_32_array(account.address.as_slice()), &mut buf);
-        let acc_key = "account:".to_string() + unsafe{str::from_utf8_unchecked(&buf[..len as usize])};
+        let acc_key =
+            "account:".to_string() + unsafe { str::from_utf8_unchecked(&buf[..len as usize]) };
         let len = five8::encode_32(to_32_array(account.owner.as_slice()), &mut buf);
-        let owner_key = "owner:".to_string() + unsafe{str::from_utf8_unchecked(&buf[..len as usize])};
+        let owner_key =
+            "owner:".to_string() + unsafe { str::from_utf8_unchecked(&buf[..len as usize]) };
         return expr_matcher.matches_keys(&[acc_key, owner_key]);
     });
 

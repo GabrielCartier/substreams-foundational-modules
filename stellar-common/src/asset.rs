@@ -16,10 +16,11 @@ fn map_issue_asset(block: Block) -> Result<Assets, substreams::errors::Error> {
             return;
         }
         let hash = Hex(&transaction.hash).to_string();
-        let decoded_transaction = match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
-            Ok(trx) => trx,
-            Err(_) => return,
-        };
+        let decoded_transaction =
+            match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
+                Ok(trx) => trx,
+                Err(_) => return,
+            };
 
         decoded_transaction
             .operations

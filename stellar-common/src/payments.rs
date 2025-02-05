@@ -21,81 +21,88 @@ fn map_payments(block: Block) -> Result<Payments, substreams::errors::Error> {
 
         let hash = Hex(&transaction.hash).to_string();
 
-        let trx = match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
-            Ok(trx) => trx,
-            Err(_) => return,
-        };
+        let trx =
+            match utils::decode_transaction(&transaction.result_xdr, &transaction.envelope_xdr) {
+                Ok(trx) => trx,
+                Err(_) => return,
+            };
 
-        trx.operations.iter().for_each(|operation| match &operation.body {
-            stellar_xdr::curr::OperationBody::Payment(payment) => {
-                let amount = payment.amount as f64 / constants::XLM_DENOMINATOR;
-                let asset = utils::match_asset_code(&payment.asset);
-                let destination = payment.destination.to_string();
-                let source;
-                if asset == constants::XML_ASSET_CODE {
-                    source = match operation.source_account.as_ref() {
-                        Some(account) => account.to_string(),
+        trx.operations
+            .iter()
+            .for_each(|operation| match &operation.body {
+                stellar_xdr::curr::OperationBody::Payment(payment) => {
+                    let amount = payment.amount as f64 / constants::XLM_DENOMINATOR;
+                    let asset = utils::match_asset_code(&payment.asset);
+                    let destination = payment.destination.to_string();
+                    let source;
+                    if asset == constants::XML_ASSET_CODE {
+                        source = match operation.source_account.as_ref() {
+                            Some(account) => account.to_string(),
 
-                        None => {
-                            let trx_source = trx.source_account.to_string();
-                            if trx_source != "" {
-                                trx_source
-                            } else {
-                                constants::XLM_SOURCE_ACCOUNT.into()
+                            None => {
+                                let trx_source = trx.source_account.to_string();
+                                if trx_source != "" {
+                                    trx_source
+                                } else {
+                                    constants::XLM_SOURCE_ACCOUNT.into()
+                                }
+                            }
+                        }
+                    } else {
+                        source = match operation.source_account.as_ref() {
+                            Some(account) => account.to_string(),
+
+                            None => {
+                                let trx_source = trx.source_account.to_string();
+                                if trx_source != "" {
+                                    trx_source
+                                } else {
+                                    utils::fetch_asset_issuer(&payment.asset)
+                                }
                             }
                         }
                     }
-                } else {
-                    source = match operation.source_account.as_ref() {
-                        Some(account) => account.to_string(),
-
-                        None => {
-                            let trx_source = trx.source_account.to_string();
-                            if trx_source != "" {
-                                trx_source
-                            } else {
-                                utils::fetch_asset_issuer(&payment.asset)
-                            }
+                    payments.payments.push(Payment {
+                        source: source,
+                        amount: amount,
+                        asset,
+                        destination,
+                        trx_hash: hash.clone(),
+                    });
+                }
+                stellar_xdr::curr::OperationBody::AccountMerge(muxed_account) => {
+                    let destination_account = muxed_account.to_string();
+                    let result_xdr = match utils::decode_transaction_result(&transaction.result_xdr)
+                    {
+                        Ok(result) => result,
+                        Err(_) => return,
+                    };
+                    match utils::decode_account_merge_result(&result_xdr) {
+                        Some(result) => {
+                            let amount = result as f64 / constants::XLM_DENOMINATOR;
+                            payments.payments.push(Payment {
+                                source: trx.source_account.to_string(),
+                                amount,
+                                asset: constants::XML_ASSET_CODE.to_string(),
+                                destination: destination_account,
+                                trx_hash: hash.clone(),
+                            });
                         }
+                        None => return,
                     }
                 }
-                payments.payments.push(Payment {
-                    source: source,
-                    amount: amount,
-                    asset,
-                    destination,
-                    trx_hash: hash.clone(),
-                });
-            }
-            stellar_xdr::curr::OperationBody::AccountMerge(muxed_account) => {
-                let destination_account = muxed_account.to_string();
-                let result_xdr = match utils::decode_transaction_result(&transaction.result_xdr) {
-                    Ok(result) => result,
-                    Err(_) => return,
-                };
-                match utils::decode_account_merge_result(&result_xdr) {
-                    Some(result) => {
-                        let amount = result as f64 / constants::XLM_DENOMINATOR;
-                        payments.payments.push(Payment {
-                            source: trx.source_account.to_string(),
-                            amount,
-                            asset: constants::XML_ASSET_CODE.to_string(),
-                            destination: destination_account,
-                            trx_hash: hash.clone(),
-                        });
-                    }
-                    None => return,
-                }
-            }
-            _ => {}
-        });
+                _ => {}
+            });
     });
 
     Ok(payments)
 }
 
 #[substreams::handlers::map]
-fn filtered_payments(query: String, payments: Payments) -> Result<Payments, substreams::errors::Error> {
+fn filtered_payments(
+    query: String,
+    payments: Payments,
+) -> Result<Payments, substreams::errors::Error> {
     let query = substreams::expr_matcher(&query);
 
     let mut filtered_payments = Payments {
