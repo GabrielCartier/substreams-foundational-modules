@@ -2,9 +2,12 @@
 name = "solana-common"
 version = "0.1.0"
 description = "Substreams showcasing the building blocks of Solana"
-edition = "2021"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/solana-common"
-license = "Apache 2.0"
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 [lib]
 name = "substreams"
@@ -20,4 +23,4 @@ substreams = { workspace = true }
 substreams-solana = "0.14"
 
 [dev-dependencies]
-base64 = { workspace = true }
+testing = { workspace = true }

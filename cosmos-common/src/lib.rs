@@ -1,6 +1,4 @@
 mod pb;
-#[cfg(test)]
-mod testing;
 
 use core::panic;
 use std::collections::HashMap;
@@ -264,7 +262,7 @@ mod tests {
     #[test]
     fn test_filtered_events() {
         // Given
-        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
         let result = _filtered_events("type:transfer".to_owned(), _all_events(block).unwrap());
@@ -281,7 +279,7 @@ mod tests {
     #[test]
     fn test_filtered_event_groups() {
         // Given
-        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
         let result =
@@ -309,7 +307,7 @@ mod tests {
     #[test]
     fn test_filtered_event_by_attribute_value() {
         // Given
-        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
         let result = _filtered_events_by_attribute_value(
@@ -339,7 +337,7 @@ mod tests {
     #[test]
     fn test_filtered_event_groups_by_attribute_value() {
         // Given
-        let block = testing::read_block("testdata/injective_mainnet_103863031.binpb.base64");
+        let block = testing::read_block("./src/testdata/injective_mainnet_103863031.binpb.base64");
 
         // When
         let result = _filtered_event_groups_by_attribute_value(

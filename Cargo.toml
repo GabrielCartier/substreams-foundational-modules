@@ -6,6 +6,7 @@ members = [
     "solana-accounts-common",
     "solana-common",
     "stellar-common",
+    "testing",
 ]
 resolver = "2"
 
@@ -25,6 +26,7 @@ num-bigint = "0.4"
 prost = "0.13"
 prost-types = "0.13"
 substreams = "0.6"
+testing = { path = "./testing" }
 
 [profile.release]
 lto = true

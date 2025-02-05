@@ -32,5 +32,5 @@ substreams-ethereum = "0.10"
 getrandom = { version = "0.2", features = ["custom"] }
 
 [dev-dependencies]
-base64 = { workspace = true }
 criterion = { version = "0.5", features = ["html_reports"] }
+testing = { workspace = true }

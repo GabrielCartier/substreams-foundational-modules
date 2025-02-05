@@ -96,11 +96,9 @@ pub fn call_keys(call: &substreams_ethereum::pb::eth::v2::Call) -> Vec<String> {
 pub mod tests {
     use super::*;
 
-    use crate::testing;
-
     #[test]
     fn test_all_calls() {
-        let block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block = testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         let result = _all_calls(block).expect("Failed to execute function");
         assert_eq!(result.calls.len(), 670);
@@ -109,7 +107,8 @@ pub mod tests {
     #[test]
     fn test_filtered_calls() {
         // Given
-        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block: Block =
+            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
         let result = _filtered_calls(

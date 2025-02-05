@@ -1,0 +1,17 @@
+[package]
+name = "testing"
+version = "0.0.1"
+description = "Substreams testing package used for unit tests within Substreams Foundational Modules."
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+name = "testing"
+
+[dependencies]
+anyhow = { workspace = true }
+base64 = { workspace = true }
+prost = { workspace = true }

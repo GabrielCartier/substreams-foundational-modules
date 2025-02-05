@@ -66,12 +66,11 @@ fn _transactions_by_programid_and_account_without_votes(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing;
 
     #[test]
     fn test_transactions_by_programid_without_votes() {
         // Given
-        let block = testing::read_block("testdata/solana_mainnet_313000000.binpb.base64");
+        let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
         let result = _transactions_by_programid_without_votes(
@@ -95,7 +94,7 @@ mod tests {
     #[test]
     fn test_transactions_by_programid_and_account_without_votes() {
         // Given
-        let block = testing::read_block("testdata/solana_mainnet_313000000.binpb.base64");
+        let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
         let result = _transactions_by_programid_and_account_without_votes(

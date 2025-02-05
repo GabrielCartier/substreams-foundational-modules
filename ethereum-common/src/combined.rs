@@ -150,12 +150,12 @@ fn _filtered_transactions(query: String, block: Block) -> Result<Transactions, E
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use crate::testing;
 
     #[test]
     fn test_filtered_events_and_calls() {
         // Given
-        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block: Block =
+            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
         let result = _filtered_events_and_calls(
@@ -187,7 +187,8 @@ pub mod tests {
     #[test]
     fn test_filtered_transactions() {
         // Given
-        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block: Block =
+            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
         let result = _filtered_transactions(

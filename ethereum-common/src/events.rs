@@ -90,12 +90,12 @@ pub fn evt_keys(log: &substreams_ethereum::pb::eth::v2::Log) -> Vec<String> {
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use crate::testing;
 
     #[test]
     fn test_filtered_events() {
         // Given
-        let block: Block = testing::read_block("testdata/ethereum_mainnet_10500500.binpb.base64");
+        let block: Block =
+            testing::read_block("./src/testdata/ethereum_mainnet_10500500.binpb.base64");
 
         // When
         let result = _filtered_events(

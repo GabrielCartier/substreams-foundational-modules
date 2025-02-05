@@ -34,12 +34,11 @@ pub fn _blocks_without_votes(mut block: Block) -> Result<Block, substreams::erro
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::testing;
 
     #[test]
     fn test_block_without_votes() {
         // Given
-        let block = testing::read_block("testdata/solana_mainnet_313000000.binpb.base64");
+        let block = testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
 
         // When
         let result = _blocks_without_votes(block).expect("Failed to execute function");

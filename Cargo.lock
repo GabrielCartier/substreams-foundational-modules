@@ -278,7 +278,6 @@ name = "cosmos-common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "base64",
  "cosmrs",
  "getrandom 0.2.15",
  "hex",
@@ -286,6 +285,7 @@ dependencies = [
  "prost-types 0.13.4",
  "sha2 0.10.8",
  "substreams 0.6.0",
+ "testing",
 ]
 
 [[package]]
@@ -606,7 +606,6 @@ name = "ethereum-common"
 version = "0.3.0"
 dependencies = [
  "anyhow",
- "base64",
  "criterion",
  "ethabi",
  "getrandom 0.2.15",
@@ -616,6 +615,7 @@ dependencies = [
  "prost-types 0.13.4",
  "substreams 0.6.0",
  "substreams-ethereum",
+ "testing",
 ]
 
 [[package]]
@@ -1782,7 +1782,7 @@ dependencies = [
 
 [[package]]
 name = "solana-accounts-common"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -1799,13 +1799,13 @@ name = "solana-common"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "base64",
  "bs58 0.4.0",
  "num-bigint",
  "prost 0.13.4",
  "prost-types 0.13.4",
  "substreams 0.6.0",
  "substreams-solana",
+ "testing",
 ]
 
 [[package]]
@@ -2179,6 +2179,15 @@ dependencies = [
  "serde_bytes",
  "subtle-encoding",
  "time",
+]
+
+[[package]]
+name = "testing"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "base64",
+ "prost 0.13.4",
 ]
 
 [[package]]
