@@ -10,7 +10,6 @@ keywords.workspace = true
 categories.workspace = true
 
 [lib]
-name = "substreams"
 crate-type = ["cdylib"]
 
 [dependencies]

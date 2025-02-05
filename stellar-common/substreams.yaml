@@ -12,7 +12,7 @@ protobuf:
   importPaths:
     - ./proto/sf/substreams/stellar/type/v1
   descriptorSets:
-    - module: buf.build/streamingfast/firehose-stellar
+    - localPath: ./descriptors/firehose-stellar.binpb
   excludePaths:
     - google
     - sf/substreams/

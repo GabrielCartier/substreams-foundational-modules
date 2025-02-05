@@ -19,8 +19,8 @@ protobuf:
   importPaths:
     - ./proto/sf/substreams/solana/type/v1
   descriptorSets:
-    - module: buf.build/streamingfast/firehose-solana
-    - module: buf.build/streamingfast/substreams
+    - localPath: ./descriptors/firehose-solana.binpb
+    - localPath: ./descriptors/substreams.binpb
   excludePaths:
     - google
     - sf/substreams/

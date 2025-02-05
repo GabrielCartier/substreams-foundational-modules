@@ -4,8 +4,9 @@ build:
 
 .PHONY: package
 package: build
-	@projects=$$(find . -mindepth 1 -maxdepth 1 -type d | grep -v target | grep -v .git); \
+	@projects=$$(find . -mindepth 1 -maxdepth 1 -type d | grep -Ev '(.git|target|testing)'); \
 	for project in $$projects; do \
+		set -e ; \
 		echo "Substreams packing $$project..."; \
 		pushd $$project > /dev/null; \
 		substreams build; \
