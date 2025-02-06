@@ -60,6 +60,8 @@ fn _transactions_by_programid_and_account_without_votes(
 
 #[cfg(test)]
 mod tests {
+    use substreams_solana::base58;
+
     use super::*;
 
     #[test]
@@ -101,6 +103,19 @@ mod tests {
         // Expect
         result.transactions.into_iter().for_each(|transaction| {
             let mut matched = true;
+
+            if !transaction
+                .transaction
+                .clone()
+                .unwrap()
+                .message
+                .unwrap()
+                .account_keys
+                .iter()
+                .any(|acct| base58::encode(acct) == "5qrvgpvr55Eo7c5bBcwopdiQ6TpvceiRm42yjHTbtDvc")
+            {
+                matched = false
+            }
 
             // Check if the given program id is contained within the instructions.
             if !transaction.walk_instructions().any(|instruction| {
