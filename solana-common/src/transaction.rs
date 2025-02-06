@@ -146,7 +146,7 @@ mod tests {
     fn test_transactions_by_programid_and_account_without_votes_account_keys() {
         // Given
         let block: Block =
-            testing::read_block("./src/testdata/solana_mainnet_313000000.binpb.base64");
+            testing::read_block("./src/testdata/solana_mainnet_318251413.binpb.base64");
 
         // When
         let result = _transactions_by_programid_and_account_without_votes(
@@ -187,6 +187,7 @@ mod tests {
             })
             .collect();
 
+        assert!(result.transactions.len() > 0);
         assert_eq!(result.transactions.len(), expected_transactions.len());
         result.transactions.iter().for_each(|result_transaction| {
             assert_eq!(
