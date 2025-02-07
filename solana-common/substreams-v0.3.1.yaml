@@ -11,6 +11,17 @@ imports:
   v020: https://spkg.io/streamingfast/solana-common-v0.2.0.spkg
   v030: https://spkg.io/streamingfast/solana-common-v0.3.0.spkg
 
+protobuf:
+  excludePaths:
+    - sf/substreams/rpc
+    - sf/substreams/v1
+    - sf/substreams/sink
+    - sf/substreams/index
+    - sf/substreams/index/v1
+    - instructions.proto # sol.instructions.v1 from the v0.2.0 spkg
+    - transactions.proto # sol.transactions.v1 from the v0.2.0 spkg
+    - google
+
 binaries:
   default:
     type: wasm/rust-v1
