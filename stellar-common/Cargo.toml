@@ -11,6 +11,7 @@ name = "substreams"
 crate-type = ["cdylib"]
 
 [dependencies]
+bigdecimal = "0.4.7"
 bs58 = "0.4"
 num-bigint = "0.4"
 prost = "0.13"

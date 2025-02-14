@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package sf.substreams.stellar.type.v1;
 
+import "google/protobuf/timestamp.proto";
+
 message Accounts {
   repeated Account accounts = 1;
 }
@@ -12,16 +14,61 @@ message Account {
   double balance = 3;
 }
 
-message Payments {
-  repeated Payment payments = 1;
+message EventMeta {
+  uint64 ledger_sequence = 1;
+  google.protobuf.Timestamp closed_at = 2; 
+  string trx_hash = 3;
 }
 
-message Payment {
-  string trx_hash = 1;
-  string source = 2;
-  string destination = 3;
-  string asset = 4;
-  double amount = 5; // todo: check if this should be a big int instead
+message TokenTransfers {
+  repeated TokenTransfer token_transfer_events = 1;
+}
+
+message TokenTransfer {
+  EventMeta meta = 1;
+  optional string asset = 2;
+  oneof event {
+    Transfer transfer = 3;
+    Mint mint = 4;
+    Burn burn = 5;
+    Clawback clawback = 6;
+    Fee fee = 7;
+  }
+}
+
+message Address {
+  oneof address_type {
+    string smart_contract_address = 1; // Smart Contract address
+    string account_address = 2;       // Account address
+    string liquidity_pool_hash = 3;   // Liquidity Pool hash
+    string claimable_balance_id = 4;  // Claimable Balance ID
+  }
+}
+
+message Transfer {
+  Address from = 1;
+  Address to = 2;
+  string amount = 3; // BigDecimal
+}
+
+message Mint {
+  Address to = 1;
+  string amount = 2; // BigDecimal
+}
+
+message Burn {
+  Address from = 1;
+  string amount = 2; // BigDecimal
+}
+
+message Clawback {
+  Address from = 1;
+  string amount = 3; // BigDecimal
+}
+
+message Fee {
+  Address from = 1;
+  string amount = 2; // BigDecimal
 }
 
 message Assets {

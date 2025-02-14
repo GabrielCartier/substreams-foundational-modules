@@ -45,7 +45,7 @@ modules:
     output:
       type: proto:sf.substreams.stellar.type.v1.Accounts
 
-  - name: map_payments
+  - name: map_transfer_tokens
     kind: map
     initialBlock: 55411000
     inputs:
@@ -64,7 +64,7 @@ modules:
   - name: index_payments
     kind: blockIndex
     inputs:
-      - map: map_payments
+      - map: map_token_transfers
     output:
       type: proto:sf.substreams.index.v1.Keys
 
@@ -76,7 +76,7 @@ modules:
         params: true
     inputs:
       - params: string
-      - map: map_payments
+      - map: map_token_transfers
     output:
       type: proto:sf.substreams.stellar.type.v1.Payments
 

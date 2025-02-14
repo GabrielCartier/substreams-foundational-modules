@@ -18,24 +18,118 @@ pub struct Account {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Payments {
-    #[prost(message, repeated, tag="1")]
-    pub payments: ::prost::alloc::vec::Vec<Payment>,
+pub struct EventMeta {
+    #[prost(uint64, tag="1")]
+    pub ledger_sequence: u64,
+    #[prost(message, optional, tag="2")]
+    pub closed_at: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(string, tag="3")]
+    pub trx_hash: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Payment {
-    #[prost(string, tag="1")]
-    pub trx_hash: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub source: ::prost::alloc::string::String,
+pub struct TokenTransfers {
+    #[prost(message, repeated, tag="1")]
+    pub token_transfer_events: ::prost::alloc::vec::Vec<TokenTransfer>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TokenTransfer {
+    #[prost(message, optional, tag="1")]
+    pub meta: ::core::option::Option<EventMeta>,
+    #[prost(string, optional, tag="2")]
+    pub asset: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(oneof="token_transfer::Event", tags="3, 4, 5, 6, 7")]
+    pub event: ::core::option::Option<token_transfer::Event>,
+}
+/// Nested message and enum types in `TokenTransfer`.
+pub mod token_transfer {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Event {
+        #[prost(message, tag="3")]
+        Transfer(super::Transfer),
+        #[prost(message, tag="4")]
+        Mint(super::Mint),
+        #[prost(message, tag="5")]
+        Burn(super::Burn),
+        #[prost(message, tag="6")]
+        Clawback(super::Clawback),
+        #[prost(message, tag="7")]
+        Fee(super::Fee),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Address {
+    #[prost(oneof="address::AddressType", tags="1, 2, 3, 4")]
+    pub address_type: ::core::option::Option<address::AddressType>,
+}
+/// Nested message and enum types in `Address`.
+pub mod address {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum AddressType {
+        /// Smart Contract address
+        #[prost(string, tag="1")]
+        SmartContractAddress(::prost::alloc::string::String),
+        /// Account address
+        #[prost(string, tag="2")]
+        AccountAddress(::prost::alloc::string::String),
+        /// Liquidity Pool hash
+        #[prost(string, tag="3")]
+        LiquidityPoolHash(::prost::alloc::string::String),
+        /// Claimable Balance ID
+        #[prost(string, tag="4")]
+        ClaimableBalanceId(::prost::alloc::string::String),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Transfer {
+    #[prost(message, optional, tag="1")]
+    pub from: ::core::option::Option<Address>,
+    #[prost(message, optional, tag="2")]
+    pub to: ::core::option::Option<Address>,
+    /// BigDecimal
     #[prost(string, tag="3")]
-    pub destination: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub asset: ::prost::alloc::string::String,
-    /// todo: check if this should be a big int instead
-    #[prost(double, tag="5")]
-    pub amount: f64,
+    pub amount: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Mint {
+    #[prost(message, optional, tag="1")]
+    pub to: ::core::option::Option<Address>,
+    /// BigDecimal
+    #[prost(string, tag="2")]
+    pub amount: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Burn {
+    #[prost(message, optional, tag="1")]
+    pub from: ::core::option::Option<Address>,
+    /// BigDecimal
+    #[prost(string, tag="2")]
+    pub amount: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Clawback {
+    #[prost(message, optional, tag="1")]
+    pub from: ::core::option::Option<Address>,
+    /// BigDecimal
+    #[prost(string, tag="3")]
+    pub amount: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Fee {
+    #[prost(message, optional, tag="1")]
+    pub from: ::core::option::Option<Address>,
+    /// BigDecimal
+    #[prost(string, tag="2")]
+    pub amount: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
