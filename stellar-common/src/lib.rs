@@ -1,7 +1,3 @@
-mod accounts;
-mod asset;
-mod constants;
-mod index;
-mod payments;
+mod operations;
 mod pb;
 mod utils;

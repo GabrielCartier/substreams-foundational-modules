@@ -29,56 +29,10 @@ binaries:
 network: stellar-testnet
 
 modules:
-  - name: map_created_accounts
+  - name: map_operations
     kind: map
     initialBlock: 761000
     inputs:
       - source: sf.stellar.type.v1.Block
     output:
-      type: proto:sf.substreams.stellar.type.v1.Accounts
-
-  - name: map_deleted_accounts
-    kind: map
-    initialBlock: 761000
-    inputs:
-      - source: sf.stellar.type.v1.Block
-    output:
-      type: proto:sf.substreams.stellar.type.v1.Accounts
-
-  - name: map_payments
-    kind: map
-    initialBlock: 761000
-    inputs:
-      - source: sf.stellar.type.v1.Block
-    output:
-      type: proto:sf.substreams.stellar.type.v1.Payments
-
-  - name: map_issue_asset
-    kind: map
-    initialBlock: 761000
-    inputs:
-      - source: sf.stellar.type.v1.Block
-    output:
-      type: proto:sf.substreams.stellar.type.v1.Assets
-
-  - name: index_payments
-    kind: blockIndex
-    inputs:
-      - map: map_payments
-    output:
-      type: proto:sf.substreams.index.v1.Keys
-
-  - name: filtered_payments
-    kind: map
-    blockFilter:
-      module: index_payments
-      query:
-        params: true
-    inputs:
-      - params: string
-      - map: map_payments
-    output:
-      type: proto:sf.substreams.stellar.type.v1.Payments
-
-params: # Default parameters for the filtered modules. You can override these parameters based on your needs.
-  filtered_payments: "account:GCX737AN5PYCV4ZUMGGDIGSVUW4JDFXA5NOMNLOG4GC3NRGQFJVPVGIS"
+      type: proto:sf.substreams.stellar.type.v1.Operations
