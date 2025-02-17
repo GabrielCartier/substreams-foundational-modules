@@ -21,6 +21,7 @@ categories = ["wasm"]
 [workspace.dependencies]
 anyhow = "1"
 base64 = "0.22.1"
+bs58 = "0.4"
 hex = "0.4.3"
 num-bigint = "0.4"
 prost = "0.13"

@@ -24,14 +24,13 @@ imports:
 binaries:
   default:
     type: wasm/rust-v1
-    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+    file: ../target/wasm32-unknown-unknown/release/stellar_common.wasm
 
-network: stellar-testnet
+network: stellar-mainnet
 
 modules:
   - name: map_operations
     kind: map
-    initialBlock: 761000
     inputs:
       - source: sf.stellar.type.v1.Block
     output:
