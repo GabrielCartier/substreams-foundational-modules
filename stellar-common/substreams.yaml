@@ -4,7 +4,7 @@ package:
   description: "Foundational module for Stellar"
   image: ./stellar.png
   name: stellar_foundational
-  version: v0.2.0
+  version: v0.3.0
 
 protobuf:
   files:
