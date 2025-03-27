@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "common",
     "antelope-common",
     "cosmos-common",
     "ethereum-common",
