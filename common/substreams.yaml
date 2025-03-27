@@ -1,0 +1,22 @@
+specVersion: v0.1.0
+package:
+  name: common
+  version: v0.1.0
+  url: https://github.com/streamingfast/substreams-foundational-modules/common
+  doc: |
+    Substreams modules common to all the supported chains
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../target/wasm32-unknown-unknown/release/common.wasm
+
+modules:
+  - name: map_clocks
+    kind: map
+    inputs:
+      - source: sf.substreams.v1.Clock
+    output:
+      type: proto:sf.substreams.v1.Clock
+    doc: |
+      `map_clocks` maps the clock for every block in the chain.
