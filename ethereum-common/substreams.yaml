@@ -38,6 +38,15 @@ binaries:
     file: ../target/wasm32-unknown-unknown/release/ethereum_common.wasm
 
 modules:
+  - name: map_clock
+    kind: map
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:sf.substreams.v1.Clock
+    doc: |
+      `map_clock` outputs the Clock (timestamp, block hash and block number) of all the blocks in the chain.
+  
   - name: all_events
     kind: map
     inputs:
