@@ -1,6 +1,6 @@
 [package]
 name = "ethereum-common"
-version = "0.3.1"
+version = "0.3.2"
 description = "Foundational Substreams Modules for Ethereum"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/ethereum-common"
 edition.workspace = true
@@ -25,7 +25,7 @@ num-bigint = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
 substreams = { workspace = true }
-substreams-ethereum = "0.10"
+substreams-ethereum = "0.10.4"
 
 # Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
 [target.wasm32-unknown-unknown.dependencies]
