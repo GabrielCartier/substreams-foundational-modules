@@ -2,8 +2,7 @@ use std::collections::HashSet;
 
 use substreams::pb::sf::substreams::index::v1::Keys;
 
-use crate::pb::sf::tron::type::v1::Transaction;
-use crate::pb::sf::tron::type::v1::Transactions;
+use crate::pb::sf::tron::type::v1::{Transaction, Transactions};
 use crate::pb::protocol;
 
 #[substreams::handlers::map]

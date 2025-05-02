@@ -1,0 +1,50 @@
+specVersion: v0.1.0
+package:
+  url: https://github.com/streamingfast/substreams-foundational-modules/tron-common
+  description: "Foundational module for Tron"
+  image: ./tron.png
+  name: tron_foundational
+  version: v0.1.0
+
+imports:
+  tron: https://github.com/streamingfast/substreams-tron/releases/download/v0.1.0/tron-v0.1.0.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ../target/wasm32-unknown-unknown/release/tron_common.wasm
+
+network: tron-mainnet
+
+modules:        
+  - name: map_transactions
+    kind: map
+    inputs:
+      - source: sf.tron.type.v1.Block
+    output:
+      type: proto:sf.substreams.tron.type.v1.Transactions
+
+  - name: index_transactions
+    kind: blockIndex
+    inputs:
+      - map: map_transactions
+    output:
+      type: proto:sf.substreams.index.v1.Keys
+
+  - name: filtered_transactions
+    kind: map
+    inputs:
+      - params: string
+      - map: map_transactions
+    blockFilter:
+      module: index_transactions
+      query:
+        params: true
+    output:
+      type: proto:sf.substreams.tron.type.v1.Transactions
+
+
+params:
+  filtered_transactions: contract_type:TransferContract
+
+
