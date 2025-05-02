@@ -1,0 +1,23 @@
+[package]
+name = "tron-common"
+version = "0.1.0"
+description = "Substreams showcasing the building blocks of Tron"
+edition = "2021"
+repository = "https://github.com/streamingfast/substreams-foundational-modules/tron-common"
+license = "Apache 2.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bigdecimal = "0.4.7"
+bs58 = { workspace = true }
+num-bigint = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+substreams = { workspace = true }
+anyhow = { workspace = true }
+base64 = { workspace = true }
+
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = { version = "0.2", features = ["custom"] }
