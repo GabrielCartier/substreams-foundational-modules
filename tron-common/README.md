@@ -1,6 +1,6 @@
-# Tron Foundational Modules
+# TRON Foundational Modules
 
-The **Tron Foundational Modules** Substreams contains a set of modules that allow you to easily retrieve basic information from the Tron blockchain.
+The **TRON Foundational Modules** Substreams contains a set of modules that allow you to easily retrieve basic information from the TRON blockchain.
 
 ## Modules
 

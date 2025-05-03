@@ -1,28 +1,40 @@
 specVersion: v0.1.0
 package:
   url: https://github.com/streamingfast/substreams-foundational-modules/tron-common
-  description: "Foundational module for Tron"
+  description: "Foundational module for TRON"
   image: ./tron.png
   name: tron_foundational
   version: v0.1.0
 
 imports:
-  tron: https://github.com/streamingfast/substreams-tron/releases/download/v0.1.0/tron-v0.1.0.spkg
+  tron: https://github.com/streamingfast/substreams-tron/releases/download/v0.1.1/tron-v0.1.1.spkg
+
+protobuf:
+  files:
+    - transaction.proto
+  importPaths:
+    - ./proto/sf/substreams/tron/v1
+  excludePaths:
+    - api
+    - google
+    - sf/substreams/
+    - sf/firehose/
 
 binaries:
   default:
     type: wasm/rust-v1
     file: ../target/wasm32-unknown-unknown/release/tron_common.wasm
 
-network: tron-mainnet
+network: tron
 
-modules:        
+modules:
   - name: map_transactions
     kind: map
     inputs:
+      - source: sf.substreams.v1.Clock
       - source: sf.tron.type.v1.Block
     output:
-      type: proto:sf.substreams.tron.type.v1.Transactions
+      type: proto:sf.substreams.tron.v1.Transactions
 
   - name: index_transactions
     kind: blockIndex
@@ -41,10 +53,7 @@ modules:
       query:
         params: true
     output:
-      type: proto:sf.substreams.tron.type.v1.Transactions
-
+      type: proto:sf.substreams.tron.v1.Transactions
 
 params:
   filtered_transactions: contract_type:TransferContract
-
-

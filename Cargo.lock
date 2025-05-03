@@ -627,7 +627,7 @@ dependencies = [
 
 [[package]]
 name = "ethereum-common"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "anyhow",
  "criterion",
@@ -1981,9 +1981,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-ethereum"
-version = "0.10.2"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b683085832624e6435bebb94c51de62f84407229bc3890a87274dcd53dd1104"
+checksum = "8cbebe786a62068f91593c89038fbe5ec70c9b784df716e450c52aa01b231f11"
 dependencies = [
  "getrandom 0.2.15",
  "num-bigint",
@@ -1995,9 +1995,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-ethereum-abigen"
-version = "0.10.2"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "738e7b7714ae625bf8169d509e1b1eb9df5a4aaf8ec2de996ee7b58917280f7d"
+checksum = "1abdb13d5c4336d9d16ec31fbf8b4b41edde5f33b489186d7673a1017421b387"
 dependencies = [
  "anyhow",
  "ethabi",
@@ -2012,9 +2012,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-ethereum-core"
-version = "0.10.2"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ee0e352e9549af3f823a5182be0ec52948a9727a7134824f77e6d20eb7924f1"
+checksum = "2bd3dbe2597daba8db0ae15b9a9cb4284236d0f39b4a5ba79c7c14978639613c"
 dependencies = [
  "bigdecimal 0.3.1",
  "ethabi",
@@ -2028,9 +2028,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-ethereum-derive"
-version = "0.10.2"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1d4c4edcc6a4427ade7b005de61d91c00fb91f20ca3bc5bfdf686ed433e874b"
+checksum = "322330809d485b2926b65136b4b4eb1a9069c0a60275464f8a3c1f35a77f7c77"
 dependencies = [
  "ethabi",
  "heck 0.4.1",
@@ -2325,6 +2325,21 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "winnow",
+]
+
+[[package]]
+name = "tron-common"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "bigdecimal 0.4.7",
+ "bs58 0.4.0",
+ "getrandom 0.2.15",
+ "num-bigint",
+ "prost 0.13.4",
+ "prost-types 0.13.4",
+ "substreams 0.6.0",
 ]
 
 [[package]]

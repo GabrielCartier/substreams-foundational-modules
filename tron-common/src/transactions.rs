@@ -1,28 +1,31 @@
 use crate::{
     index,
-    pb::sf::tron::type::v1::{Block, Transaction, Transactions},
+    pb::sf::{
+        substreams::{tron::v1::Transactions, v1::Clock},
+        tron::r#type::v1::{Block, Transaction},
+    },
 };
 
 #[substreams::handlers::map]
-fn map_transactions(block: Block) -> Result<Transactions, substreams::errors::Error> {
+fn map_transactions(clock: Clock, block: Block) -> Result<Transactions, substreams::errors::Error> {
     // TODO: filter failed transactions
     let transactions: Vec<Transaction> = block.transactions;
-    Ok(Transactions { transactions })
+    Ok(Transactions {
+        transactions,
+        clock: Some(clock),
+    })
 }
 
 #[substreams::handlers::map]
 fn filtered_transactions(
     query: String,
-    transactions: Transactions,
+    mut transactions: Transactions,
 ) -> Result<Transactions, substreams::errors::Error> {
     let matcher = substreams::expr_matcher(&query);
-    let transactions: Vec<Transaction> = transactions
-        .transactions
-        .into_iter()
-        .filter(|transaction| {
-            matcher.matches_keys(&index::transaction_keys(transaction))
-        })
-        .collect();
 
-    Ok(Transactions { transactions })
-} 
+    transactions
+        .transactions
+        .retain(|transaction| matcher.matches_keys(&index::transaction_keys(transaction)));
+
+    Ok(transactions)
+}
