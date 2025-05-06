@@ -1,6 +1,7 @@
 use crate::pb::protocol::transaction::contract::ContractType;
 use crate::pb::sf::substreams::tron::v1::Transactions;
 use crate::pb::sf::tron::r#type::v1::Transaction;
+use crate::utils::{extract_from_address, tron_address_to_base58};
 use std::collections::HashSet;
 use substreams::pb::sf::substreams::index::v1::Keys;
 
@@ -29,6 +30,13 @@ pub fn transaction_keys(transaction: &Transaction) -> Vec<String> {
                 .map(|t| t.as_str_name())
                 .unwrap_or("Unknown")
         ));
+
+        if let Some(ref parameter) = contract.parameter {
+            if let Some(owner_bytes) = extract_from_address(contract.r#type, parameter) {
+                let tron_address = tron_address_to_base58(&owner_bytes);
+                keys.push(format!("from:{}", tron_address));
+            }
+        }
     }
 
     keys

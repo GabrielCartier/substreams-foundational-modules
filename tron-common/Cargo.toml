@@ -18,6 +18,7 @@ prost-types = { workspace = true }
 substreams = { workspace = true }
 anyhow = { workspace = true }
 base64 = { workspace = true }
+sha2 = "0.10.8"
 
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.2", features = ["custom"] }

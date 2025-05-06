@@ -4,10 +4,30 @@ The **TRON Foundational Modules** Substreams contains a set of modules that allo
 
 ## Modules
 
+### map_transactions
+
+This module retrieves all the **NOT** failed transactions, without any more filtering.
+
+### filtered_transactions
+
+This module uses the `index_transactions` cache to match the filtered transactions based on the parameters passed as input to the module.
+
+You can directly _use_ this module to retrieve filtered transactions:
+
+```yaml
+modules:
+    - name: my_module
+      use: tron_common:filtered_transactions
+
+params:
+    my_module: source_account:account1
+```
+
 ### index_transactions
 
 This module creates a cache of transactions based on:
 - The _contract type_ of every transactions.
+- The _owner address_ of every transactions.
 
 You can use this module as a `blockFilter` to filter transactions based on the parameters specified above:
 
@@ -17,5 +37,5 @@ You can use this module as a `blockFilter` to filter transactions based on the p
     blockFilter:
       module: index_transactions
       query:
-        string: (contract_type:contract_type1 || contract_type:contract_type2)
+        string: (contract_type:contract_type1 || from:tron_address)
 ```
