@@ -162,7 +162,7 @@ pub fn extract_from_address(contract_type: i32, parameter: &Any) -> Option<Vec<u
         Some(ContractType::AccountCreateContract) => {
             extract_param!(protocol::AccountCreateContract, parameter, owner_address)
         }
-        // TODO: Validate this
+        // TODO: Validate that there are no owner addresses for these contract types
         Some(ContractType::CustomContract) => None,
         Some(ContractType::GetContract) => None,
         None => None,
@@ -184,37 +184,50 @@ pub fn extract_to_address(contract_type: i32, parameter: &Any) -> Option<Vec<u8>
             parameter,
             to_address
         ),
-        // TODO: Validate this
+        // TODO: Do we want to extract all the vote addresses as `to` addresses?
+        // https://buf.build/streamingfast/tron-protocol/file/main:core/vote_asset_contract.proto
         // ContractType::VoteAssetContract => {
         //     extract_repeated!(protocol::VoteAssetContract, parameter, vote_address)
         // }
+        // TODO: Is this the correct to address?
+        // https://buf.build/streamingfast/tron-protocol/docs/main:protocol#protocol.UnDelegateResourceContract
         ContractType::UnDelegateResourceContract => extract_param!(
             protocol::UnDelegateResourceContract,
             parameter,
             receiver_address
         ),
+        // TODO: Is this the correct to address?
+        // https://buf.build/streamingfast/tron-protocol/docs/main:protocol#protocol.DelegateResourceContract
         ContractType::DelegateResourceContract => extract_param!(
             protocol::DelegateResourceContract,
             parameter,
             receiver_address
         ),
+        // TODO: Is this the correct to address?
+        // https://buf.build/streamingfast/tron-protocol/docs/main:protocol#protocol.UnfreezeBalanceContract
         ContractType::UnfreezeBalanceContract => extract_param!(
             protocol::UnfreezeBalanceContract,
             parameter,
             receiver_address
         ),
+        // TODO: Is this the correct to address?
+        // https://buf.build/streamingfast/tron-protocol/docs/main:protocol#protocol.FreezeBalanceContract
         ContractType::FreezeBalanceContract => {
             extract_param!(protocol::FreezeBalanceContract, parameter, receiver_address)
         }
+        // TODO: Is this the correct to address?
+        // https://buf.build/streamingfast/tron-protocol/docs/main:protocol#protocol.ShieldedTransferContract
         ContractType::ShieldedTransferContract => extract_param!(
             protocol::ShieldedTransferContract,
             parameter,
             transparent_to_address
         ),
+        // TODO: Is this the correct to address?
+        // https://buf.build/streamingfast/tron-protocol/docs/main:protocol#protocol.AccountCreateContract
         ContractType::AccountCreateContract => {
             extract_param!(protocol::AccountCreateContract, parameter, account_address)
         }
-        // TODO: Validate this
+        // TODO: Validate this, there are no to addresses for these other contract types
         _ => None,
     }
 }
