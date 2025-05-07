@@ -3,6 +3,7 @@ use crate::pb::sf::tron::r#type::v1::ResponseCode;
 use bs58;
 use prost::Message;
 use prost_types::Any;
+use protocol::transaction::contract::ContractType;
 use sha2::{Digest, Sha256};
 use std::convert::TryFrom;
 
@@ -10,8 +11,8 @@ pub fn transaction_failed(status: i32) -> bool {
     status != ResponseCode::Success as i32
 }
 
-/// Macro to reduce repetition when extracting owner_address from contract parameters.
-macro_rules! extract_owner {
+/// Macro to extract parameter from a contract. Used to extract the from and to addresses from a contract.
+macro_rules! extract_param {
     ($struct_type:ty, $parameter:expr, $field:ident) => {
         <$struct_type>::decode(&$parameter.value[..])
             .ok()
@@ -22,150 +23,199 @@ macro_rules! extract_owner {
 /// Extracts the 'from' (owner) address from a contract parameter, if available.
 /// Returns None if the contract type does not have an owner address.
 pub fn extract_from_address(contract_type: i32, parameter: &Any) -> Option<Vec<u8>> {
-    use protocol::transaction::contract::ContractType;
     match ContractType::try_from(contract_type).ok() {
         Some(ContractType::TransferContract) => {
-            extract_owner!(protocol::TransferContract, parameter, owner_address)
+            extract_param!(protocol::TransferContract, parameter, owner_address)
         }
         Some(ContractType::TransferAssetContract) => {
-            extract_owner!(protocol::TransferAssetContract, parameter, owner_address)
+            extract_param!(protocol::TransferAssetContract, parameter, owner_address)
         }
         Some(ContractType::VoteAssetContract) => {
-            extract_owner!(protocol::VoteAssetContract, parameter, owner_address)
+            extract_param!(protocol::VoteAssetContract, parameter, owner_address)
         }
         Some(ContractType::VoteWitnessContract) => {
-            extract_owner!(protocol::VoteWitnessContract, parameter, owner_address)
+            extract_param!(protocol::VoteWitnessContract, parameter, owner_address)
         }
         Some(ContractType::WitnessCreateContract) => {
-            extract_owner!(protocol::WitnessCreateContract, parameter, owner_address)
+            extract_param!(protocol::WitnessCreateContract, parameter, owner_address)
         }
         Some(ContractType::AssetIssueContract) => {
-            extract_owner!(protocol::AssetIssueContract, parameter, owner_address)
+            extract_param!(protocol::AssetIssueContract, parameter, owner_address)
         }
         Some(ContractType::WitnessUpdateContract) => {
-            extract_owner!(protocol::WitnessUpdateContract, parameter, owner_address)
+            extract_param!(protocol::WitnessUpdateContract, parameter, owner_address)
         }
-        Some(ContractType::ParticipateAssetIssueContract) => extract_owner!(
+        Some(ContractType::ParticipateAssetIssueContract) => extract_param!(
             protocol::ParticipateAssetIssueContract,
             parameter,
             owner_address
         ),
         Some(ContractType::AccountUpdateContract) => {
-            extract_owner!(protocol::AccountUpdateContract, parameter, owner_address)
+            extract_param!(protocol::AccountUpdateContract, parameter, owner_address)
         }
         Some(ContractType::FreezeBalanceContract) => {
-            extract_owner!(protocol::FreezeBalanceContract, parameter, owner_address)
+            extract_param!(protocol::FreezeBalanceContract, parameter, owner_address)
         }
         Some(ContractType::UnfreezeBalanceContract) => {
-            extract_owner!(protocol::UnfreezeBalanceContract, parameter, owner_address)
+            extract_param!(protocol::UnfreezeBalanceContract, parameter, owner_address)
         }
         Some(ContractType::WithdrawBalanceContract) => {
-            extract_owner!(protocol::WithdrawBalanceContract, parameter, owner_address)
+            extract_param!(protocol::WithdrawBalanceContract, parameter, owner_address)
         }
         Some(ContractType::UnfreezeAssetContract) => {
-            extract_owner!(protocol::UnfreezeAssetContract, parameter, owner_address)
+            extract_param!(protocol::UnfreezeAssetContract, parameter, owner_address)
         }
         Some(ContractType::UpdateAssetContract) => {
-            extract_owner!(protocol::UpdateAssetContract, parameter, owner_address)
+            extract_param!(protocol::UpdateAssetContract, parameter, owner_address)
         }
         Some(ContractType::ProposalCreateContract) => {
-            extract_owner!(protocol::ProposalCreateContract, parameter, owner_address)
+            extract_param!(protocol::ProposalCreateContract, parameter, owner_address)
         }
         Some(ContractType::ProposalApproveContract) => {
-            extract_owner!(protocol::ProposalApproveContract, parameter, owner_address)
+            extract_param!(protocol::ProposalApproveContract, parameter, owner_address)
         }
         Some(ContractType::ProposalDeleteContract) => {
-            extract_owner!(protocol::ProposalDeleteContract, parameter, owner_address)
+            extract_param!(protocol::ProposalDeleteContract, parameter, owner_address)
         }
         Some(ContractType::SetAccountIdContract) => {
-            extract_owner!(protocol::SetAccountIdContract, parameter, owner_address)
+            extract_param!(protocol::SetAccountIdContract, parameter, owner_address)
         }
         Some(ContractType::CreateSmartContract) => {
-            extract_owner!(protocol::CreateSmartContract, parameter, owner_address)
+            extract_param!(protocol::CreateSmartContract, parameter, owner_address)
         }
         Some(ContractType::TriggerSmartContract) => {
-            extract_owner!(protocol::TriggerSmartContract, parameter, owner_address)
+            extract_param!(protocol::TriggerSmartContract, parameter, owner_address)
         }
         Some(ContractType::UpdateSettingContract) => {
-            extract_owner!(protocol::UpdateSettingContract, parameter, owner_address)
+            extract_param!(protocol::UpdateSettingContract, parameter, owner_address)
         }
         Some(ContractType::ExchangeCreateContract) => {
-            extract_owner!(protocol::ExchangeCreateContract, parameter, owner_address)
+            extract_param!(protocol::ExchangeCreateContract, parameter, owner_address)
         }
         Some(ContractType::ExchangeInjectContract) => {
-            extract_owner!(protocol::ExchangeInjectContract, parameter, owner_address)
+            extract_param!(protocol::ExchangeInjectContract, parameter, owner_address)
         }
         Some(ContractType::ExchangeWithdrawContract) => {
-            extract_owner!(protocol::ExchangeWithdrawContract, parameter, owner_address)
+            extract_param!(protocol::ExchangeWithdrawContract, parameter, owner_address)
         }
-        Some(ContractType::ExchangeTransactionContract) => extract_owner!(
+        Some(ContractType::ExchangeTransactionContract) => extract_param!(
             protocol::ExchangeTransactionContract,
             parameter,
             owner_address
         ),
-        Some(ContractType::UpdateEnergyLimitContract) => extract_owner!(
+        Some(ContractType::UpdateEnergyLimitContract) => extract_param!(
             protocol::UpdateEnergyLimitContract,
             parameter,
             owner_address
         ),
-        Some(ContractType::AccountPermissionUpdateContract) => extract_owner!(
+        Some(ContractType::AccountPermissionUpdateContract) => extract_param!(
             protocol::AccountPermissionUpdateContract,
             parameter,
             owner_address
         ),
         Some(ContractType::ClearAbiContract) => {
-            extract_owner!(protocol::ClearAbiContract, parameter, owner_address)
+            extract_param!(protocol::ClearAbiContract, parameter, owner_address)
         }
         Some(ContractType::UpdateBrokerageContract) => {
-            extract_owner!(protocol::UpdateBrokerageContract, parameter, owner_address)
+            extract_param!(protocol::UpdateBrokerageContract, parameter, owner_address)
         }
         // For ShieldedTransferContract, the owner address is in the transparent_from_address field
-        Some(ContractType::ShieldedTransferContract) => extract_owner!(
+        Some(ContractType::ShieldedTransferContract) => extract_param!(
             protocol::ShieldedTransferContract,
             parameter,
             transparent_from_address
         ),
         Some(ContractType::MarketSellAssetContract) => {
-            extract_owner!(protocol::MarketSellAssetContract, parameter, owner_address)
+            extract_param!(protocol::MarketSellAssetContract, parameter, owner_address)
         }
-        Some(ContractType::MarketCancelOrderContract) => extract_owner!(
+        Some(ContractType::MarketCancelOrderContract) => extract_param!(
             protocol::MarketCancelOrderContract,
             parameter,
             owner_address
         ),
         Some(ContractType::FreezeBalanceV2Contract) => {
-            extract_owner!(protocol::FreezeBalanceV2Contract, parameter, owner_address)
+            extract_param!(protocol::FreezeBalanceV2Contract, parameter, owner_address)
         }
-        Some(ContractType::UnfreezeBalanceV2Contract) => extract_owner!(
+        Some(ContractType::UnfreezeBalanceV2Contract) => extract_param!(
             protocol::UnfreezeBalanceV2Contract,
             parameter,
             owner_address
         ),
-        Some(ContractType::WithdrawExpireUnfreezeContract) => extract_owner!(
+        Some(ContractType::WithdrawExpireUnfreezeContract) => extract_param!(
             protocol::WithdrawExpireUnfreezeContract,
             parameter,
             owner_address
         ),
         Some(ContractType::DelegateResourceContract) => {
-            extract_owner!(protocol::DelegateResourceContract, parameter, owner_address)
+            extract_param!(protocol::DelegateResourceContract, parameter, owner_address)
         }
-        Some(ContractType::UnDelegateResourceContract) => extract_owner!(
+        Some(ContractType::UnDelegateResourceContract) => extract_param!(
             protocol::UnDelegateResourceContract,
             parameter,
             owner_address
         ),
-        Some(ContractType::CancelAllUnfreezeV2Contract) => extract_owner!(
+        Some(ContractType::CancelAllUnfreezeV2Contract) => extract_param!(
             protocol::CancelAllUnfreezeV2Contract,
             parameter,
             owner_address
         ),
         Some(ContractType::AccountCreateContract) => {
-            extract_owner!(protocol::AccountCreateContract, parameter, owner_address)
+            extract_param!(protocol::AccountCreateContract, parameter, owner_address)
         }
         // TODO: Validate this
         Some(ContractType::CustomContract) => None,
         Some(ContractType::GetContract) => None,
         None => None,
+    }
+}
+
+/// Extracts the 'to' (recipient) address from a contract parameter, if available.
+/// Returns None if the contract type does not have a to address.
+pub fn extract_to_address(contract_type: i32, parameter: &Any) -> Option<Vec<u8>> {
+    match ContractType::try_from(contract_type).ok()? {
+        ContractType::TransferContract => {
+            extract_param!(protocol::TransferContract, parameter, to_address)
+        }
+        ContractType::TransferAssetContract => {
+            extract_param!(protocol::TransferAssetContract, parameter, to_address)
+        }
+        ContractType::ParticipateAssetIssueContract => extract_param!(
+            protocol::ParticipateAssetIssueContract,
+            parameter,
+            to_address
+        ),
+        // TODO: Validate this
+        // ContractType::VoteAssetContract => {
+        //     extract_repeated!(protocol::VoteAssetContract, parameter, vote_address)
+        // }
+        ContractType::UnDelegateResourceContract => extract_param!(
+            protocol::UnDelegateResourceContract,
+            parameter,
+            receiver_address
+        ),
+        ContractType::DelegateResourceContract => extract_param!(
+            protocol::DelegateResourceContract,
+            parameter,
+            receiver_address
+        ),
+        ContractType::UnfreezeBalanceContract => extract_param!(
+            protocol::UnfreezeBalanceContract,
+            parameter,
+            receiver_address
+        ),
+        ContractType::FreezeBalanceContract => {
+            extract_param!(protocol::FreezeBalanceContract, parameter, receiver_address)
+        }
+        ContractType::ShieldedTransferContract => extract_param!(
+            protocol::ShieldedTransferContract,
+            parameter,
+            transparent_to_address
+        ),
+        ContractType::AccountCreateContract => {
+            extract_param!(protocol::AccountCreateContract, parameter, account_address)
+        }
+        // TODO: Validate this
+        _ => None,
     }
 }
 
@@ -185,6 +235,7 @@ mod tests {
     use super::*;
     use crate::pb::protocol;
     use crate::pb::protocol::transaction::contract::ContractType;
+    use base64::Engine;
     use prost_types::Any;
 
     // Helper macro to automate test generation for contract types with owner_address
@@ -201,6 +252,24 @@ mod tests {
                 };
                 let result = extract_from_address($contract_type as i32, &any);
                 assert_eq!(result, Some(owner));
+            }
+        };
+    }
+
+    // Helper macro to automate test generation for contract types with to_address
+    macro_rules! test_to_extract {
+        ($name:ident, $contract_type:expr, $struct_type:ty, $field:ident) => {
+            #[test]
+            fn $name() {
+                let to = vec![9, 8, 7, 6];
+                let mut contract = <$struct_type>::default();
+                contract.$field = to.clone();
+                let any = Any {
+                    type_url: format!("type.googleapis.com/{}", stringify!($struct_type)),
+                    value: contract.encode_to_vec(),
+                };
+                let result = extract_to_address($contract_type as i32, &any);
+                assert_eq!(result, Some(to));
             }
         };
     }
@@ -478,4 +547,59 @@ mod tests {
         let addr = tron_address_to_base58(&bytes);
         assert_eq!(addr, expected);
     }
+
+    test_to_extract!(
+        extract_to_transfer_contract,
+        ContractType::TransferContract,
+        protocol::TransferContract,
+        to_address
+    );
+    test_to_extract!(
+        extract_to_transfer_asset_contract,
+        ContractType::TransferAssetContract,
+        protocol::TransferAssetContract,
+        to_address
+    );
+    test_to_extract!(
+        extract_to_participate_asset_issue_contract,
+        ContractType::ParticipateAssetIssueContract,
+        protocol::ParticipateAssetIssueContract,
+        to_address
+    );
+    test_to_extract!(
+        extract_to_undelegate_resource_contract,
+        ContractType::UnDelegateResourceContract,
+        protocol::UnDelegateResourceContract,
+        receiver_address
+    );
+    test_to_extract!(
+        extract_to_delegate_resource_contract,
+        ContractType::DelegateResourceContract,
+        protocol::DelegateResourceContract,
+        receiver_address
+    );
+    test_to_extract!(
+        extract_to_unfreeze_balance_contract,
+        ContractType::UnfreezeBalanceContract,
+        protocol::UnfreezeBalanceContract,
+        receiver_address
+    );
+    test_to_extract!(
+        extract_to_freeze_balance_contract,
+        ContractType::FreezeBalanceContract,
+        protocol::FreezeBalanceContract,
+        receiver_address
+    );
+    test_to_extract!(
+        extract_to_shielded_transfer_contract,
+        ContractType::ShieldedTransferContract,
+        protocol::ShieldedTransferContract,
+        transparent_to_address
+    );
+    test_to_extract!(
+        extract_to_account_create_contract,
+        ContractType::AccountCreateContract,
+        protocol::AccountCreateContract,
+        account_address
+    );
 }

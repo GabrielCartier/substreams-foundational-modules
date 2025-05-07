@@ -27,7 +27,8 @@ params:
 
 This module creates a cache of transactions based on:
 - The _contract type_ of every transactions.
-- The _owner address_ of every transactions.
+- The _owner address_ of every transactions that support it.
+- The _to address_ of every transactions that suppoirt it
 
 You can use this module as a `blockFilter` to filter transactions based on the parameters specified above:
 
@@ -37,5 +38,5 @@ You can use this module as a `blockFilter` to filter transactions based on the p
     blockFilter:
       module: index_transactions
       query:
-        string: (contract_type:contract_type1 || from:tron_address)
+        string: (contract_type:contract_type1 || from:tron_address || to:tron_address)
 ```
