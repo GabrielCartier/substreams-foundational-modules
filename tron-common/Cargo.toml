@@ -1,7 +1,7 @@
 [package]
 name = "tron-common"
 version = "0.1.0"
-description = "Substreams showcasing the building blocks of Tron"
+description = "Substreams showcasing the building blocks of TRON"
 edition = "2021"
 repository = "https://github.com/streamingfast/substreams-foundational-modules/tron-common"
 license = "Apache 2.0"
