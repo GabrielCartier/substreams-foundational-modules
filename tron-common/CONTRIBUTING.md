@@ -1,6 +1,6 @@
 # Contributing
 
-## Tron Foundational Substreams
+## TRON Foundational Substreams
 
 ### Protobuf bindings
 
