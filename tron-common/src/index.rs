@@ -45,5 +45,12 @@ pub fn transaction_keys(transaction: &Transaction) -> Vec<String> {
         }
     }
 
+    if let Some(ref info) = transaction.info {
+        if !info.contract_address.is_empty() {
+            let tron_address = tron_address_to_base58(&info.contract_address);
+            keys.push(format!("contract_address:{}", tron_address));
+        }
+    }
+
     keys
 }
