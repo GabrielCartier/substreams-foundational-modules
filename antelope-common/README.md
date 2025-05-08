@@ -31,7 +31,7 @@ Send a substreams request with the desired query as parameter. You can use a gRP
 > substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.4.0.spkg filtered_actions -s 370000000 -p filtered_actions="code:atomicassets && action:createcol" --production-mode
 ```
 If the request with this query hasn't been run before, substreams backend will start the indexing process and you should start seeing new events. If the request has been run before, you should start seeing sale actions right away jumping over any empty chunks of blocks when there were no sales.
-Note, we used `--production-mode` flag - this ensures backend writes indexes on disk so they can be re-used in the future. 
+Note, we used `--production-mode` flag - this ensures backend writes indexes on disk so they can be re-used in the future.
 
 ### Example queries
 - `code:mycontract`
@@ -57,13 +57,13 @@ Queries can include `&&` and `||` logical operands, as well as `(` and `)` paren
 
 
 ### Release
-v0.4.0: https://substreams.dev/pinax-network/antelope-common/v0.4.0
+v0.5.0: https://substreams.dev/packages/antelope-common/v0.5.0 or https://github.com/pinax-network/substreams-foundational-modules/releases/tag/antelope-common-v0.5.0
 
 
 ### Usage
 ```bash
-substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.4.0.spkg filtered_actions -s -10000 -p filtered_actions="code:tethertether && action:transfer" --production-mode
-substreams gui -e eos.substreams.pinax.network:443 https://spkg.io/pinax-network/antelope-common-v0.4.0.spkg filtered_actions_extra -s -10000 -p filtered_actions_extra="code:eosio.token && action:transfer && (data.to:myaccount || data.from::myaccount)"" --production-mode
+substreams gui -e eos.substreams.pinax.network:443 antelope-common@v0.5.0 filtered_actions -s 10000000 -p filtered_actions="code:eosio.token && action:transfer" --production-mode
+substreams gui -e eos.substreams.pinax.network:443 antelope-common@v0.5.0 filtered_actions_extra -s 10000000 -p filtered_actions_extra="code:eosio.token && action:transfer && (data.to:myaccount || data.from::myaccount)" --production-mode
 ```
 
 ### Known issues
