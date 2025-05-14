@@ -31,7 +31,7 @@ This module creates a cache of transactions based on:
 - The _owner address_ of every transactions that support it.
 - The _to address_ of every transactions that suppoirt it
 
-You can use this module as a `blockFilter` to filter transactions based on the parameters specified above:
+You can use this module as a `blockFilter` to filter transactions based on the parameters specified above. Here's an example to filter all the USDT (`TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`) transfers from `TMAP4Dnyh2og7bzW6HxZfuZqRSTHsVDKRT`:
 
 ```yaml
   - name: my_module
@@ -39,5 +39,5 @@ You can use this module as a `blockFilter` to filter transactions based on the p
     blockFilter:
       module: index_transactions
       query:
-        string: (contract_type:TransferAssetContract && contract_address:TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t && from:TMAP4Dnyh2og7bzW6HxZfuZqRSTHsVDKRT)
+        string: (contract_type:TriggerSmartContract && contract_address:TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t && from:TMAP4Dnyh2og7bzW6HxZfuZqRSTHsVDKRT)
 ```
