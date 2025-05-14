@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package sf.substreams.tron.v1;
+
+import 'sf/tron/type/v1/block.proto';
+import 'sf/substreams/v1/clock.proto';
+
+message Transactions {
+  repeated sf.tron.type.v1.Transaction transactions = 1;
+  sf.substreams.v1.Clock clock = 2;
+}
+
